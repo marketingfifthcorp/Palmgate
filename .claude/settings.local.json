@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npx figma-developer-mcp --help 2>&1 | Select-Object -First 30)",
+      "PowerShell(claude mcp *)",
+      "Bash(claude mcp *)",
+      "PowerShell(npm run *)",
+      "Bash(node -e \"const l = require\\('lucide-react'\\); const keys = Object.keys\\(l\\).filter\\(k => k.toLowerCase\\(\\).includes\\('twitter'\\) || k.toLowerCase\\(\\).includes\\('instagram'\\) || k.toLowerCase\\(\\).includes\\('face'\\) || k.toLowerCase\\(\\).includes\\('youtube'\\) || k.toLowerCase\\(\\).includes\\('linked'\\) || k.toLowerCase\\(\\).includes\\('social'\\)\\); console.log\\(keys\\);\")",
+      "mcp__figma__get_figma_data",
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(Remove-Item *)",
+      "Bash(xargs grep -l \"proxy\\\\|middleware\")",
+      "mcp__claude-in-chrome__tabs_context_mcp",
+      "Bash(curl -s \"http://localhost:3000/api/properties/search?limit=3\")",
+      "mcp__claude-in-chrome__browser_batch",
+      "mcp__claude-in-chrome__computer",
+      "mcp__claude-in-chrome__navigate"
+    ]
+  }
+}
