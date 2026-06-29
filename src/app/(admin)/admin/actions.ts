@@ -72,3 +72,50 @@ export async function updateLeadStatus(id: string, status: LeadStatus): Promise<
   revalidatePath("/admin/leads");
   revalidatePath("/admin/dashboard");
 }
+
+export async function addPropertyImage(data: {
+  property_id: string;
+  storage_path: string;
+  alt?: string;
+  is_primary?: boolean;
+  display_order?: number;
+}): Promise<{ error?: string; id?: string }> {
+  const supabase = createServiceClient();
+  if (data.is_primary) {
+    await supabase
+      .from("property_images")
+      .update({ is_primary: false })
+      .eq("property_id", data.property_id);
+  }
+  const { data: row, error } = await supabase
+    .from("property_images")
+    .insert(data as never)
+    .select("id")
+    .single();
+  if (error) return { error: error.message };
+  revalidatePath(`/admin/properties`);
+  revalidatePath(`/properties`);
+  return { id: (row as { id: string }).id };
+}
+
+export async function deletePropertyImage(id: string, storagePath: string): Promise<{ error?: string }> {
+  const supabase = createServiceClient();
+  if (!storagePath.startsWith("http")) {
+    await supabase.storage.from("properties").remove([storagePath]);
+  }
+  const { error } = await supabase.from("property_images").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath(`/admin/properties`);
+  revalidatePath(`/properties`);
+  return {};
+}
+
+export async function setPropertyImagePrimary(propertyId: string, imageId: string): Promise<{ error?: string }> {
+  const supabase = createServiceClient();
+  await supabase.from("property_images").update({ is_primary: false }).eq("property_id", propertyId);
+  const { error } = await supabase.from("property_images").update({ is_primary: true }).eq("id", imageId);
+  if (error) return { error: error.message };
+  revalidatePath(`/admin/properties`);
+  revalidatePath(`/properties`);
+  return {};
+}
