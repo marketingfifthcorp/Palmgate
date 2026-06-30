@@ -22,6 +22,7 @@ interface Props {
   defaultCondition?: PropertyCondition;
   propertyId?: string;
   onSaveAgentPhoto?: (path: string | null) => Promise<{ error?: string }>;
+  extraSections?: React.ReactNode;
 }
 
 type F = {
@@ -120,7 +121,7 @@ const inputClass =
 
 const labelClass = "block text-xs font-medium text-pg-body mb-1.5";
 
-export default function PropertyForm({ initial, action, redirectTo = "/admin/properties", defaultCondition, propertyId, onSaveAgentPhoto }: Props) {
+export default function PropertyForm({ initial, action, redirectTo = "/admin/properties", defaultCondition, propertyId, onSaveAgentPhoto, extraSections }: Props) {
   const [f, setF] = useState<F>(() => {
     const base = fromRow(initial);
     if (!initial && defaultCondition) base.condition = defaultCondition;
@@ -275,17 +276,22 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
           </div>
           <div>
             <label className={labelClass}>Availability *</label>
-            <select value={f.availability} onChange={(e) => set("availability", e.target.value)} className={inputClass + " bg-white"}>
+            <select value={f.availability} onChange={(e) => set("availability", e.target.value)} className={inputClass + " bg-white"}
+              disabled={isOffPlan}>
               <option value="for_sale">For Sale</option>
-              <option value="for_rent">For Rent</option>
+              {!isOffPlan && <option value="for_rent">For Rent</option>}
             </select>
           </div>
           <div>
             <label className={labelClass}>Condition *</label>
-            <select value={f.condition} onChange={(e) => set("condition", e.target.value as PropertyCondition)} className={inputClass + " bg-white"}>
-              <option value="ready">Ready</option>
-              <option value="off_plan">Off-Plan</option>
-            </select>
+            {isOffPlan ? (
+              <div className={inputClass + " bg-gray-50 text-pg-muted cursor-not-allowed"}>Off-Plan</div>
+            ) : (
+              <select value={f.condition} onChange={(e) => set("condition", e.target.value as PropertyCondition)} className={inputClass + " bg-white"}>
+                <option value="ready">Ready</option>
+                <option value="off_plan">Off-Plan</option>
+              </select>
+            )}
           </div>
         </div>
       </section>
@@ -297,10 +303,10 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
         </h3>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelClass}>Price *</label>
+            <label className={labelClass}>{isOffPlan ? "Starting Price *" : "Price *"}</label>
             <input type="number" required value={f.price}
               onChange={(e) => set("price", e.target.value)}
-              placeholder="2500000" min="0"
+              placeholder={isOffPlan ? "e.g. 95000" : "e.g. 285000"} min="0"
               className={inputClass} />
           </div>
           <div>
@@ -310,17 +316,17 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
               placeholder="AED" className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>Bedrooms</label>
+            <label className={labelClass}>{isOffPlan ? "Bedrooms (from)" : "Bedrooms"}</label>
             <input type="number" value={f.bedrooms}
               onChange={(e) => set("bedrooms", e.target.value)}
-              placeholder="2" min="0"
+              placeholder={isOffPlan ? "e.g. 1 (smallest unit)" : "2"} min="0"
               className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>Bathrooms</label>
+            <label className={labelClass}>{isOffPlan ? "Bathrooms (from)" : "Bathrooms"}</label>
             <input type="number" value={f.bathrooms}
               onChange={(e) => set("bathrooms", e.target.value)}
-              placeholder="2" min="0"
+              placeholder={isOffPlan ? "e.g. 1 (smallest unit)" : "2"} min="0"
               className={inputClass} />
           </div>
           <div>
@@ -351,20 +357,24 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
           Property Details
         </h3>
         <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label className={labelClass}>Year Built</label>
-            <input type="number" value={f.year_built}
-              onChange={(e) => set("year_built", e.target.value)}
-              placeholder="e.g. 2021" min="1900" max="2100"
-              className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass}>Floor Number</label>
-            <input type="number" value={f.floor_number}
-              onChange={(e) => set("floor_number", e.target.value)}
-              placeholder="e.g. 5" min="0"
-              className={inputClass} />
-          </div>
+          {!isOffPlan && (
+            <div>
+              <label className={labelClass}>Year Built</label>
+              <input type="number" value={f.year_built}
+                onChange={(e) => set("year_built", e.target.value)}
+                placeholder="e.g. 2021" min="1900" max="2100"
+                className={inputClass} />
+            </div>
+          )}
+          {!isOffPlan && (
+            <div>
+              <label className={labelClass}>Floor Number</label>
+              <input type="number" value={f.floor_number}
+                onChange={(e) => set("floor_number", e.target.value)}
+                placeholder="e.g. 5" min="0"
+                className={inputClass} />
+            </div>
+          )}
           <div>
             <label className={labelClass}>Parking Spaces</label>
             <input type="number" value={f.parking_spaces}
@@ -372,14 +382,16 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
               placeholder="e.g. 2" min="0"
               className={inputClass} />
           </div>
-          <div className="flex items-center gap-3 pt-5">
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={f.has_terrace}
-                onChange={(e) => set("has_terrace", e.target.checked)}
-                className="w-4 h-4 accent-pg-gold rounded" />
-              <span className="text-sm text-pg-body">Has Terrace</span>
-            </label>
-          </div>
+          {!isOffPlan && (
+            <div className="flex items-center gap-3 pt-5">
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input type="checkbox" checked={f.has_terrace}
+                  onChange={(e) => set("has_terrace", e.target.checked)}
+                  className="w-4 h-4 accent-pg-gold rounded" />
+                <span className="text-sm text-pg-body">Has Terrace</span>
+              </label>
+            </div>
+          )}
         </div>
       </section>
 
@@ -435,10 +447,16 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
               className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>Community</label>
+            <label className={labelClass}>
+              {["apartment", "penthouse", "office"].includes(f.type) ? "Building Name" : "Community"}
+            </label>
             <input type="text" value={f.community}
               onChange={(e) => set("community", e.target.value)}
-              placeholder="e.g. Dubai Marina"
+              placeholder={
+                ["apartment", "penthouse", "office"].includes(f.type)
+                  ? "e.g. Majestic Residences Tower C"
+                  : "e.g. Al Mouj (The Wave)"
+              }
               className={inputClass} />
           </div>
           <div>
@@ -500,6 +518,8 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
           </div>
         </section>
       )}
+
+      {extraSections}
 
       {/* Amenities */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">

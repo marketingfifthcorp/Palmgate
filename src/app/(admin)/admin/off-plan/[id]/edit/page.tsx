@@ -72,25 +72,25 @@ export default async function EditOffPlanPage({ params }: { params: Params }) {
           onSave={extrasAction}
         />
 
-        {/* ── 3. Basic project info (title, price, developer, payment plan, location) */}
+        {/* ── 3. Basic project info + unit types + FAQs inline ─────────── */}
         <PropertyForm
           initial={project as never}
           action={action}
           redirectTo="/admin/off-plan"
           defaultCondition="off_plan"
-        />
-
-        {/* ── 4. Unit Types ───────────────────────────────────────────────── */}
-        <OffPlanUnitEditor
-          propertyId={id}
-          initialUnits={(project.unit_types as OffPlanUnit[] | null) ?? []}
-          onSave={extrasAction}
-        />
-
-        {/* ── 5. FAQs ─────────────────────────────────────────────────────── */}
-        <OffPlanFaqsEditor
-          initialFaqs={(project.faqs as OffPlanFAQ[] | null) ?? []}
-          onSave={extrasAction}
+          extraSections={
+            <>
+              <OffPlanUnitEditor
+                propertyId={id}
+                initialUnits={(project.unit_types as OffPlanUnit[] | null) ?? []}
+                onSave={extrasAction}
+              />
+              <OffPlanFaqsEditor
+                initialFaqs={(project.faqs as OffPlanFAQ[] | null) ?? []}
+                onSave={extrasAction}
+              />
+            </>
+          }
         />
 
       </div>
