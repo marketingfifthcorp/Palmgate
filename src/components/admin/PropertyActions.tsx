@@ -10,9 +10,10 @@ interface Props {
   id: string;
   published: boolean;
   featured: boolean;
+  editHref?: string;
 }
 
-export default function PropertyActions({ id, published, featured }: Props) {
+export default function PropertyActions({ id, published, featured, editHref }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const router = useRouter();
 
@@ -26,7 +27,7 @@ export default function PropertyActions({ id, published, featured }: Props) {
   return (
     <div className="flex items-center gap-0.5">
       <Link
-        href={`/admin/properties/${id}/edit`}
+        href={editHref ?? `/admin/properties/${id}/edit`}
         className="p-1.5 rounded-lg text-pg-muted hover:text-pg-dark hover:bg-gray-100 transition-colors"
         title="Edit"
       >

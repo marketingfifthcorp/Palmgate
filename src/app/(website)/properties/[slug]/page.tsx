@@ -1,16 +1,72 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Bed, Bath, Square, MapPin, ArrowRight, Phone } from "lucide-react";
+import {
+  Bed, Bath, Square, MapPin, ArrowRight, Phone,
+  Waves, Dumbbell, Coffee, Heart, UtensilsCrossed, TreePine, Baby,
+  Car, Bell, Shield, Wind, Eye, Sparkles, Flower2, Wifi, Check,
+  Cpu, Umbrella, Trophy, Film, Activity, Flame, BookOpen, Bike,
+  PawPrint, ShoppingBag, Building2, Thermometer,
+  type LucideIcon,
+} from "lucide-react";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicUrl } from "@/lib/supabase/storage";
 import PropertyMap from "@/components/properties/PropertyMap";
 
+// ── Amenity icon mapping ─────────────────────────────────────────────────────
+const AMENITY_MAP: Array<{ keywords: string[]; icon: LucideIcon }> = [
+  { keywords: ["pool", "swimming"],                                icon: Waves },
+  { keywords: ["gym", "fitness"],                                  icon: Dumbbell },
+  { keywords: ["sauna"],                                           icon: Thermometer },
+  { keywords: ["spa", "wellness"],                                 icon: Heart },
+  { keywords: ["dining", "restaurant", "food"],                    icon: UtensilsCrossed },
+  { keywords: ["cafe", "coffee"],                                  icon: Coffee },
+  { keywords: ["retail", "shop", "mall", "market"],                icon: ShoppingBag },
+  { keywords: ["terrace", "landscape", "park"],                    icon: TreePine },
+  { keywords: ["playground", "children", "kids"],                  icon: Baby },
+  { keywords: ["parking", "garage"],                               icon: Car },
+  { keywords: ["concierge", "reception", "lobby"],                 icon: Bell },
+  { keywords: ["security", "guard"],                               icon: Shield },
+  { keywords: ["balcony"],                                         icon: Wind },
+  { keywords: ["view", "golf"],                                    icon: Eye },
+  { keywords: ["upgraded", "premium", "finishes"],                 icon: Sparkles },
+  { keywords: ["private garden", "garden", "flower"],              icon: Flower2 },
+  { keywords: ["wifi", "internet", "broadband"],                   icon: Wifi },
+  { keywords: ["smart"],                                           icon: Cpu },
+  { keywords: ["beach", "waterfront", "marina", "sea access"],     icon: Umbrella },
+  { keywords: ["tennis", "squash", "racquet", "padel"],            icon: Trophy },
+  { keywords: ["cinema", "theater", "theatre", "movie", "screen"], icon: Film },
+  { keywords: ["jogging", "running", "cycling", "bicycle", "bike"],icon: Activity },
+  { keywords: ["bbq", "barbecue", "grill", "outdoor kitchen"],     icon: Flame },
+  { keywords: ["library", "reading room", "study"],                icon: BookOpen },
+  { keywords: ["bicycle", "bike path", "cycling track"],           icon: Bike },
+  { keywords: ["pet", "dog friendly", "animal"],                   icon: PawPrint },
+  { keywords: ["rooftop", "roof deck", "sky lounge"],              icon: Building2 },
+];
+
+function amenityIcon(amenity: string): LucideIcon {
+  const n = amenity.toLowerCase().replace(/_/g, " ");
+  for (const { keywords, icon } of AMENITY_MAP) {
+    if (keywords.some((k) => n.includes(k))) return icon;
+  }
+  return Check;
+}
+
+function amenityLabel(amenity: string): string {
+  return amenity.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export const dynamic = "force-dynamic";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://palmgate.ae";
-const WHATSAPP_NUMBER = "971000000000";
+const COMPANY_WHATSAPP = "96890000000";
+
+function toWhatsapp(phone: string | null): string {
+  if (!phone) return COMPANY_WHATSAPP;
+  const digits = phone.replace(/\D/g, "");
+  return digits || COMPANY_WHATSAPP;
+}
 
 type Params = Promise<{ slug: string }>;
 
@@ -82,12 +138,12 @@ export default async function PropertyDetailPage({ params }: { params: Params })
     alt: img.alt ?? property.title,
   }));
 
-  const priceFormatted = new Intl.NumberFormat("en-AE", {
-    style: "decimal",
-    maximumFractionDigits: 0,
-  }).format(property.price);
+  const priceFormatted = property.price && property.price > 0
+    ? `${property.currency ?? "OMR"} ${new Intl.NumberFormat("en-OM", { style: "decimal", maximumFractionDigits: 0 }).format(property.price)}`
+    : "Price on Request";
 
-  const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  const waNumber = toWhatsapp(property.agent_phone as string | null);
+  const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent(
     `Hi, I am interested in ${property.title}`
   )}`;
 
@@ -101,23 +157,23 @@ export default async function PropertyDetailPage({ params }: { params: Params })
     name: property.title,
     description: property.description ?? undefined,
     url: `${BASE_URL}/properties/${slug}`,
-    offers: { "@type": "Offer", price: property.price, priceCurrency: property.currency ?? "AED" },
+    offers: { "@type": "Offer", price: property.price, priceCurrency: property.currency ?? "OMR" },
     address: {
       "@type": "PostalAddress",
       addressLocality: property.community ?? property.emirate,
       addressRegion: property.emirate,
-      addressCountry: "AE",
+      addressCountry: "OM",
     },
   };
 
   const otherDetails = [
-    { label: "Property Type", value: property.type ? property.type.charAt(0).toUpperCase() + property.type.slice(1) : "--" },
-    { label: "Square Footage", value: property.area_sqft ? property.area_sqft.toLocaleString() : "--" },
-    { label: "Year Built", value: "--" },
-    { label: "Floor Number", value: "--" },
-    { label: "Parking", value: "--" },
-    { label: "Terrace", value: "--" },
-  ];
+    { label: "Property Type",   value: property.type ? property.type.charAt(0).toUpperCase() + property.type.slice(1) : null },
+    { label: "Square Footage",  value: property.area_sqft ? `${property.area_sqft.toLocaleString()} sqft` : null },
+    { label: "Year Built",      value: property.year_built?.toString() ?? null },
+    { label: "Floor Number",    value: property.floor_number?.toString() ?? null },
+    { label: "Parking Spaces",  value: property.parking_spaces?.toString() ?? null },
+    { label: "Terrace",         value: property.has_terrace == null ? null : property.has_terrace ? "Yes" : "No" },
+  ].filter((d) => d.value !== null) as { label: string; value: string }[];
 
   return (
     <div className="bg-white min-h-screen">
@@ -208,7 +264,7 @@ export default async function PropertyDetailPage({ params }: { params: Params })
       {/* ── Price + Specs ── */}
       <div className="max-w-screen-xl mx-auto px-6 py-8 border-b border-gray-100">
         <p className="font-sans font-bold text-4xl md:text-5xl text-pg-dark mb-6">
-          {property.currency} {priceFormatted}
+          {priceFormatted}
         </p>
         <div className="flex flex-wrap gap-10">
           {property.bedrooms != null && (
@@ -244,12 +300,28 @@ export default async function PropertyDetailPage({ params }: { params: Params })
 
           {/* Agent card */}
           <div className="flex flex-col gap-4">
-            <div className="w-full aspect-square bg-gray-100 rounded-sm overflow-hidden relative">
-              <div className="absolute inset-0 bg-gray-200" />
+            <div className="w-full aspect-square bg-gray-100 rounded-sm overflow-hidden relative flex items-center justify-center">
+              {property.agent_photo_path ? (
+                <Image
+                  src={getPublicUrl(property.agent_photo_path as string)}
+                  alt={(property.agent_name as string | null) ?? "Agent"}
+                  fill
+                  className="object-cover"
+                  sizes="220px"
+                />
+              ) : (
+                <span className="text-4xl text-gray-300 font-semibold select-none">
+                  {(property.agent_name as string | null)?.[0]?.toUpperCase() ?? "P"}
+                </span>
+              )}
             </div>
             <div>
-              <p className="font-semibold text-pg-dark text-sm">Person Name</p>
-              <p className="text-pg-muted text-[12px]">Associate Partner</p>
+              <p className="font-semibold text-pg-dark text-sm">
+                {(property.agent_name as string | null) ?? "Palmgate Team"}
+              </p>
+              <p className="text-pg-muted text-[12px]">
+                {(property.agent_title as string | null) ?? "Property Consultant"}
+              </p>
             </div>
             <div className="flex flex-col gap-2">
               <a
@@ -261,31 +333,49 @@ export default async function PropertyDetailPage({ params }: { params: Params })
                 <svg viewBox="0 0 32 32" fill="currentColor" className="w-3.5 h-3.5 text-[#25D366]">
                   <path d="M16 0C7.163 0 0 7.163 0 16c0 2.836.74 5.5 2.035 7.818L0 32l8.385-2.012A15.93 15.93 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm8.07 22.514c-.334.94-1.956 1.796-2.685 1.91-.686.107-1.553.152-2.505-.158-.578-.19-1.32-.443-2.27-.868-3.996-1.727-6.606-5.76-6.804-6.027-.198-.267-1.615-2.148-1.615-4.098s1.02-2.91 1.382-3.307c.362-.397.79-.497 1.054-.497.264 0 .528.002.76.014.244.012.57-.093.893.68.333.795 1.13 2.745 1.229 2.943.1.198.165.43.033.694-.133.265-.199.43-.396.661-.198.232-.416.518-.594.696-.198.198-.404.413-.174.81.23.397 1.023 1.688 2.197 2.734 1.508 1.34 2.78 1.754 3.177 1.952.397.199.628.166.858-.1.231-.265.99-1.155 1.254-1.552.264-.397.528-.33.89-.199.362.132 2.308 1.088 2.705 1.287.397.198.661.297.76.463.099.166.099.963-.235 1.903z" />
                 </svg>
-                Whatsapp
+                WhatsApp
               </a>
-              <a
-                href={`tel:+${WHATSAPP_NUMBER}`}
-                className="inline-flex items-center gap-2 border border-gray-200 text-pg-dark text-[12px] font-medium px-4 py-2 hover:bg-gray-50 transition-colors"
-              >
-                <Phone size={13} />
-                Call us
-              </a>
+              {property.agent_phone ? (
+                <a
+                  href={`tel:${property.agent_phone as string}`}
+                  className="inline-flex items-center gap-2 border border-gray-200 text-pg-dark text-[12px] font-medium px-4 py-2 hover:bg-gray-50 transition-colors"
+                >
+                  <Phone size={13} />
+                  {property.agent_phone as string}
+                </a>
+              ) : (
+                <a
+                  href={`tel:+${COMPANY_WHATSAPP}`}
+                  className="inline-flex items-center gap-2 border border-gray-200 text-pg-dark text-[12px] font-medium px-4 py-2 hover:bg-gray-50 transition-colors"
+                >
+                  <Phone size={13} />
+                  Call us
+                </a>
+              )}
             </div>
           </div>
 
           {/* Amenities + Description */}
           <div>
-            {/* Amenity chips */}
+            {/* Amenities with icons */}
             {property.amenities?.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-8 pb-6 border-b border-gray-100">
-                {property.amenities.map((amenity: string) => (
-                  <span
-                    key={amenity}
-                    className="text-[12px] text-pg-dark border border-gray-200 px-3 py-1 hover:bg-gray-50 cursor-default"
-                  >
-                    {amenity}
-                  </span>
-                ))}
+              <div className="mb-8 pb-8 border-b border-gray-100">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-pg-muted mb-5">Amenities</p>
+                <div className="flex flex-wrap gap-6">
+                  {property.amenities.map((amenity: string) => {
+                    const Icon = amenityIcon(amenity);
+                    return (
+                      <div key={amenity} className="flex flex-col items-center gap-2 w-16 text-center">
+                        <div className="w-11 h-11 rounded-lg bg-stone-100 flex items-center justify-center">
+                          <Icon size={20} className="text-pg-dark" strokeWidth={1.5} />
+                        </div>
+                        <span className="text-[11px] text-pg-muted leading-tight">
+                          {amenityLabel(amenity)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

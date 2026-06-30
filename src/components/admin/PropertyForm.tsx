@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PropertyFormData } from "@/app/(admin)/admin/actions";
 import type { PropertyType, PropertyAvailability, PropertyCondition, PropertyRow } from "@/types/database";
+import AgentPhotoUploader from "@/components/admin/AgentPhotoUploader";
 
 function slugify(s: string) {
   return s
@@ -16,8 +17,11 @@ function slugify(s: string) {
 
 interface Props {
   initial?: PropertyRow;
-  action: (data: PropertyFormData) => Promise<{ error?: string }>;
+  action: (data: PropertyFormData) => Promise<{ error?: string; id?: string }>;
   redirectTo?: string;
+  defaultCondition?: PropertyCondition;
+  propertyId?: string;
+  onSaveAgentPhoto?: (path: string | null) => Promise<{ error?: string }>;
 }
 
 type F = {
@@ -32,18 +36,48 @@ type F = {
   bedrooms: string;
   bathrooms: string;
   area_sqft: string;
+  year_built: string;
+  floor_number: string;
+  parking_spaces: string;
+  has_terrace: boolean;
   location_name: string;
   community: string;
   emirate: string;
+  lat: string;
+  lng: string;
   developer: string;
   completion_date: string;
   plan_down: string;
   plan_during: string;
   plan_handover: string;
-  amenities: string;
+  amenities: string[];
+  agent_name: string;
+  agent_title: string;
+  agent_phone: string;
   featured: boolean;
   published: boolean;
 };
+
+const AMENITY_OPTIONS = [
+  "Swimming Pool",
+  "Gym & Fitness",
+  "Balcony",
+  "Parking",
+  "Concierge",
+  "24/7 Security",
+  "Water View",
+  "Golf Course View",
+  "Private Garden",
+  "Children's Playground",
+  "Landscaped Terrace",
+  "Wellness & Spa",
+  "Dining Destinations",
+  "Community Retail",
+  "Upgraded Finishes",
+  "Smart Home",
+  "Beach Access",
+  "Tennis Court",
+];
 
 function fromRow(row?: PropertyRow): F {
   return {
@@ -54,19 +88,28 @@ function fromRow(row?: PropertyRow): F {
     availability: row?.availability ?? "for_sale",
     condition: row?.condition ?? "ready",
     price: row?.price?.toString() ?? "",
-    currency: row?.currency ?? "AED",
+    currency: row?.currency ?? "OMR",
     bedrooms: row?.bedrooms?.toString() ?? "",
     bathrooms: row?.bathrooms?.toString() ?? "",
     area_sqft: row?.area_sqft?.toString() ?? "",
+    year_built: row?.year_built?.toString() ?? "",
+    floor_number: row?.floor_number?.toString() ?? "",
+    parking_spaces: row?.parking_spaces?.toString() ?? "",
+    has_terrace: row?.has_terrace ?? false,
     location_name: row?.location_name ?? "",
     community: row?.community ?? "",
-    emirate: row?.emirate ?? "Dubai",
+    emirate: row?.emirate ?? "Muscat",
+    lat: row?.lat?.toString() ?? "",
+    lng: row?.lng?.toString() ?? "",
     developer: row?.developer ?? "",
     completion_date: row?.completion_date ?? "",
     plan_down: row?.payment_plan?.down?.toString() ?? "",
     plan_during: row?.payment_plan?.during?.toString() ?? "",
     plan_handover: row?.payment_plan?.handover?.toString() ?? "",
-    amenities: row?.amenities?.join(", ") ?? "",
+    amenities: row?.amenities ?? [],
+    agent_name: row?.agent_name ?? "",
+    agent_title: row?.agent_title ?? "",
+    agent_phone: row?.agent_phone ?? "",
     featured: row?.featured ?? false,
     published: row?.published ?? false,
   };
@@ -77,14 +120,33 @@ const inputClass =
 
 const labelClass = "block text-xs font-medium text-pg-body mb-1.5";
 
-export default function PropertyForm({ initial, action, redirectTo = "/admin/properties" }: Props) {
-  const [f, setF] = useState<F>(() => fromRow(initial));
+export default function PropertyForm({ initial, action, redirectTo = "/admin/properties", defaultCondition, propertyId, onSaveAgentPhoto }: Props) {
+  const [f, setF] = useState<F>(() => {
+    const base = fromRow(initial);
+    if (!initial && defaultCondition) base.condition = defaultCondition;
+    return base;
+  });
   const [slugManual, setSlugManual] = useState(!!initial);
+  const [areaUnit, setAreaUnit] = useState<"sqft" | "sqm">("sqft");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  function set(field: keyof F, value: string | boolean) {
+  function switchAreaUnit(next: "sqft" | "sqm") {
+    if (next === areaUnit) return;
+    if (f.area_sqft) {
+      const v = parseFloat(f.area_sqft);
+      if (!isNaN(v)) {
+        const converted = next === "sqm"
+          ? (v / 10.7639).toFixed(2)
+          : (v * 10.7639).toFixed(0);
+        set("area_sqft", converted);
+      }
+    }
+    setAreaUnit(next);
+  }
+
+  function set(field: keyof F, value: string | boolean | string[]) {
     setF((prev) => ({ ...prev, [field]: value }));
   }
 
@@ -119,16 +181,27 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
       currency: f.currency,
       bedrooms: f.bedrooms ? parseInt(f.bedrooms) : null,
       bathrooms: f.bathrooms ? parseInt(f.bathrooms) : null,
-      area_sqft: f.area_sqft ? parseFloat(f.area_sqft) : null,
+      area_sqft: f.area_sqft
+        ? areaUnit === "sqm"
+          ? parseFloat(f.area_sqft) * 10.7639
+          : parseFloat(f.area_sqft)
+        : null,
+      year_built:     f.year_built     ? parseInt(f.year_built)     : null,
+      floor_number:   f.floor_number   ? parseInt(f.floor_number)   : null,
+      parking_spaces: f.parking_spaces ? parseInt(f.parking_spaces) : null,
+      has_terrace:    f.has_terrace,
       location_name: f.location_name || null,
       community: f.community || null,
       emirate: f.emirate || "Dubai",
+      lat: f.lat ? parseFloat(f.lat) : null,
+      lng: f.lng ? parseFloat(f.lng) : null,
       developer: isOffPlan ? (f.developer || null) : null,
       completion_date: isOffPlan ? (f.completion_date || null) : null,
       payment_plan: paymentPlan,
-      amenities: f.amenities
-        ? f.amenities.split(",").map((a) => a.trim()).filter(Boolean)
-        : [],
+      amenities: f.amenities,
+      agent_name:  f.agent_name  || null,
+      agent_title: f.agent_title || null,
+      agent_phone: f.agent_phone || null,
       featured: f.featured,
       published: f.published,
     };
@@ -139,7 +212,12 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
       setLoading(false);
       return;
     }
-    router.push(redirectTo);
+    // After creation, go to the edit page so images can be uploaded immediately
+    if (result?.id && !initial) {
+      router.push(`${redirectTo}/${result.id}/edit`);
+    } else {
+      router.push(redirectTo);
+    }
     router.refresh();
   }
 
@@ -246,13 +324,101 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
               className={inputClass} />
           </div>
           <div>
-            <label className={labelClass}>Area (sqft)</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className={labelClass.replace("mb-1.5", "")}>Area</label>
+              <div className="flex rounded-md border border-gray-200 overflow-hidden text-[11px] font-semibold">
+                <button type="button" onClick={() => switchAreaUnit("sqft")}
+                  className={`px-2.5 py-1 transition-colors ${areaUnit === "sqft" ? "bg-pg-dark text-white" : "text-pg-muted hover:text-pg-dark"}`}>
+                  sqft
+                </button>
+                <button type="button" onClick={() => switchAreaUnit("sqm")}
+                  className={`px-2.5 py-1 transition-colors ${areaUnit === "sqm" ? "bg-pg-dark text-white" : "text-pg-muted hover:text-pg-dark"}`}>
+                  sq m
+                </button>
+              </div>
+            </div>
             <input type="number" value={f.area_sqft}
               onChange={(e) => set("area_sqft", e.target.value)}
-              placeholder="1200" min="0"
+              placeholder={areaUnit === "sqft" ? "1200" : "111"} min="0"
               className={inputClass} />
           </div>
         </div>
+      </section>
+
+      {/* Property Details */}
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+          Property Details
+        </h3>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>Year Built</label>
+            <input type="number" value={f.year_built}
+              onChange={(e) => set("year_built", e.target.value)}
+              placeholder="e.g. 2021" min="1900" max="2100"
+              className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Floor Number</label>
+            <input type="number" value={f.floor_number}
+              onChange={(e) => set("floor_number", e.target.value)}
+              placeholder="e.g. 5" min="0"
+              className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Parking Spaces</label>
+            <input type="number" value={f.parking_spaces}
+              onChange={(e) => set("parking_spaces", e.target.value)}
+              placeholder="e.g. 2" min="0"
+              className={inputClass} />
+          </div>
+          <div className="flex items-center gap-3 pt-5">
+            <label className="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" checked={f.has_terrace}
+                onChange={(e) => set("has_terrace", e.target.checked)}
+                className="w-4 h-4 accent-pg-gold rounded" />
+              <span className="text-sm text-pg-body">Has Terrace</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      {/* Agent Contact */}
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+          Agent Contact
+        </h3>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>Agent Name</label>
+            <input type="text" value={f.agent_name}
+              onChange={(e) => set("agent_name", e.target.value)}
+              placeholder="e.g. Ahmed Al Rashid"
+              className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Agent Title</label>
+            <input type="text" value={f.agent_title}
+              onChange={(e) => set("agent_title", e.target.value)}
+              placeholder="e.g. Senior Property Consultant"
+              className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Agent Phone</label>
+            <input type="tel" value={f.agent_phone}
+              onChange={(e) => set("agent_phone", e.target.value)}
+              placeholder="e.g. +968 99 123 456"
+              className={inputClass} />
+          </div>
+        </div>
+
+        {propertyId && onSaveAgentPhoto && (
+          <AgentPhotoUploader
+            propertyId={propertyId}
+            initialPath={(initial?.agent_photo_path as string | null) ?? null}
+            onSave={onSaveAgentPhoto}
+          />
+        )}
       </section>
 
       {/* Location */}
@@ -280,6 +446,18 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
             <input type="text" value={f.emirate}
               onChange={(e) => set("emirate", e.target.value)}
               placeholder="Dubai" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Latitude</label>
+            <input type="number" step="any" value={f.lat}
+              onChange={(e) => set("lat", e.target.value)}
+              placeholder="25.2048" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Longitude</label>
+            <input type="number" step="any" value={f.lng}
+              onChange={(e) => set("lng", e.target.value)}
+              placeholder="55.2708" className={inputClass} />
           </div>
         </div>
       </section>
@@ -324,18 +502,105 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
       )}
 
       {/* Amenities */}
-      <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
-          Amenities
-        </h3>
-        <div>
-          <label className={labelClass}>Amenities (comma-separated)</label>
-          <textarea
-            rows={3} value={f.amenities}
-            onChange={(e) => set("amenities", e.target.value)}
-            placeholder="Pool, Gym, Parking, Concierge, Balcony"
-            className={inputClass + " resize-none"}
-          />
+      <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+            Amenities
+          </h3>
+          {f.amenities.length > 0 && (
+            <span className="text-[11px] text-pg-muted">
+              {f.amenities.length} selected
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          {AMENITY_OPTIONS.map((opt) => {
+            const checked = f.amenities.includes(opt);
+            return (
+              <label key={opt} className="flex items-center gap-2.5 cursor-pointer group">
+                <div
+                  onClick={() =>
+                    set(
+                      "amenities",
+                      checked
+                        ? f.amenities.filter((a) => a !== opt)
+                        : [...f.amenities, opt]
+                    )
+                  }
+                  className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                    checked
+                      ? "bg-pg-gold border-pg-gold"
+                      : "border-gray-300 group-hover:border-pg-gold"
+                  }`}
+                >
+                  {checked && (
+                    <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                      <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
+                <span className={`text-[13px] transition-colors ${checked ? "text-pg-dark font-medium" : "text-pg-body group-hover:text-pg-dark"}`}>
+                  {opt}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+
+        {/* Custom amenity input */}
+        <div className="pt-2 border-t border-gray-50">
+          <p className={labelClass}>Add custom amenity</p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              id="custom-amenity"
+              placeholder="e.g. Rooftop Lounge"
+              className={inputClass}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const val = (e.target as HTMLInputElement).value.trim();
+                  if (val && !f.amenities.includes(val)) {
+                    set("amenities", [...f.amenities, val]);
+                    (e.target as HTMLInputElement).value = "";
+                  }
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const input = document.getElementById("custom-amenity") as HTMLInputElement;
+                const val = input?.value.trim();
+                if (val && !f.amenities.includes(val)) {
+                  set("amenities", [...f.amenities, val]);
+                  input.value = "";
+                }
+              }}
+              className="shrink-0 px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-pg-dark hover:border-pg-gold hover:text-pg-gold transition-colors"
+            >
+              Add
+            </button>
+          </div>
+          {/* Show custom (non-preset) amenities as removable chips */}
+          {f.amenities.filter((a) => !AMENITY_OPTIONS.includes(a)).length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {f.amenities
+                .filter((a) => !AMENITY_OPTIONS.includes(a))
+                .map((a) => (
+                  <span key={a} className="inline-flex items-center gap-1.5 bg-pg-gold/10 text-pg-dark text-[12px] font-medium px-3 py-1 rounded-full border border-pg-gold/20">
+                    {a}
+                    <button
+                      type="button"
+                      onClick={() => set("amenities", f.amenities.filter((x) => x !== a))}
+                      className="text-pg-muted hover:text-pg-dark transition-colors"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+            </div>
+          )}
         </div>
       </section>
 

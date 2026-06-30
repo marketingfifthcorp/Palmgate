@@ -19,8 +19,8 @@ const LINKS = {
     { label: "Latest News", href: "/insights" },
   ],
   "Our Offices": [
-    { label: "Head Office", href: "/contact" },
-    { label: "Jumeirah Golf Estates", href: "/contact" },
+    { label: "Muscat Office", href: "/contact" },
+    { label: "Salalah Office", href: "/contact" },
   ],
 };
 
@@ -162,7 +162,7 @@ export default function Footer() {
         </div>
         <p className="text-xs text-pg-muted mb-4">Copyright © Palmgate</p>
         <p className="text-xs text-pg-muted/70 max-w-xl leading-relaxed">
-          Palmgate Real Estate is a registered real estate brokerage in the United Arab Emirates.
+          Palmgate Real Estate is a registered real estate brokerage in the Sultanate of Oman.
           All listings, prices, and availability are subject to change without notice. Information
           provided on this website is for general purposes only and does not constitute legal,
           financial, or investment advice.

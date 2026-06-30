@@ -23,7 +23,8 @@ interface Props {
 }
 
 function formatPrice(price: number, currency: string) {
-  if (price >= 1_000_000) return `${currency} ${(price / 1_000_000).toFixed(1)}M`;
+  if (!price || price <= 0) return "Price on Request";
+  if (price >= 1_000_000) return `${currency} ${(price / 1_000_000).toFixed(2)}M`;
   if (price >= 1_000) return `${currency} ${Math.round(price / 1_000)}K`;
   return `${currency} ${price.toLocaleString()}`;
 }
@@ -32,12 +33,12 @@ export default function PropertyCard({
   slug,
   title,
   price,
-  currency = "AED",
+  currency = "OMR",
   bedrooms,
   bathrooms,
   area_sqft,
   community,
-  emirate = "Dubai",
+  emirate = "Muscat",
   developer,
   completion_date,
   condition = "ready",

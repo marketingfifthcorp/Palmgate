@@ -8,9 +8,10 @@ interface Props {
   trigger?: "register" | "callback" | "brochure";
   label?: string;
   className?: string;
+  brochureUrl?: string; // if provided, download fires automatically after brochure lead is submitted
 }
 
-export default function RegisterInterestModal({ projectName, trigger = "register", label, className }: Props) {
+export default function RegisterInterestModal({ projectName, trigger = "register", label, className, brochureUrl }: Props) {
   const [open, setOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -48,13 +49,23 @@ export default function RegisterInterestModal({ projectName, trigger = "register
             name: form.name,
             email: form.email,
             phone: form.phone,
-            message: `${projectName} — ${titles[trigger]}. ${form.message}`,
-            source: "off_plan",
+            message: `${projectName} — ${titles[trigger]}. ${form.message}`.trim(),
+            source: "off_plan_inquiry",
           }),
         });
         setSubmitted(true);
+        // Trigger brochure download immediately after lead is captured
+        if (trigger === "brochure" && brochureUrl) {
+          const a = document.createElement("a");
+          a.href = brochureUrl;
+          a.download = "brochure.pdf";
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
       } catch {
-        // fail silently, still show success to user
         setSubmitted(true);
       }
     });
@@ -101,9 +112,19 @@ export default function RegisterInterestModal({ projectName, trigger = "register
                   </svg>
                 </div>
                 <p className="font-heading font-semibold text-pg-dark text-lg mb-2">Thank You!</p>
-                <p className="text-pg-muted text-sm">Our team will be in touch with you shortly.</p>
+                <p className="text-pg-muted text-sm">
+                  {trigger === "brochure" && brochureUrl
+                    ? "Your download should start automatically. Click below if it didn't."
+                    : "Our team will be in touch with you shortly."}
+                </p>
+                {trigger === "brochure" && brochureUrl && (
+                  <a href={brochureUrl} download="brochure.pdf" target="_blank" rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-2 text-[13px] font-semibold bg-pg-dark text-white px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity">
+                    Download Brochure
+                  </a>
+                )}
                 <button onClick={() => { setOpen(false); setSubmitted(false); setForm({ name: "", email: "", phone: "", message: "" }); }}
-                  className="mt-6 text-[13px] text-pg-gold hover:text-pg-gold-dark transition-colors">
+                  className="mt-4 block text-[13px] text-pg-gold hover:text-pg-gold-dark transition-colors">
                   Close
                 </button>
               </div>

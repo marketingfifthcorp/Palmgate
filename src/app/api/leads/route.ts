@@ -3,10 +3,11 @@ import { createServiceClient } from "@/lib/supabase/server";
 import type { LeadSource } from "@/types/database";
 
 const SUBJECT_MAP: Record<LeadSource, string> = {
-  contact_form: "New Contact Form Submission",
-  property_inquiry: "New Property Inquiry",
-  sell_with_us: "New Seller Inquiry",
-  newsletter: "New Newsletter Subscription",
+  contact_form:      "New Contact Form Submission",
+  property_inquiry:  "New Property Inquiry",
+  sell_with_us:      "New Seller Inquiry",
+  newsletter:        "New Newsletter Subscription",
+  off_plan_inquiry:  "New Off-Plan Interest",
 };
 
 export async function POST(request: NextRequest) {

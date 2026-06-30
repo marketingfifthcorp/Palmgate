@@ -2,7 +2,10 @@
 
 import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import type { PropertyType, PropertyAvailability, PropertyCondition, LeadStatus, PaymentPlan } from "@/types/database";
+import type {
+  PropertyType, PropertyAvailability, PropertyCondition,
+  LeadStatus, PaymentPlan, OffPlanUnit, OffPlanFAQ, OffPlanExtras,
+} from "@/types/database";
 
 export interface PropertyFormData {
   title: string;
@@ -16,24 +19,62 @@ export interface PropertyFormData {
   bedrooms: number | null;
   bathrooms: number | null;
   area_sqft: number | null;
+  year_built: number | null;
+  floor_number: number | null;
+  parking_spaces: number | null;
+  has_terrace: boolean;
   location_name: string | null;
   community: string | null;
   emirate: string;
+  lat: number | null;
+  lng: number | null;
   developer: string | null;
   completion_date: string | null;
   payment_plan: PaymentPlan | null;
   amenities: string[];
+  agent_name: string | null;
+  agent_title: string | null;
+  agent_phone: string | null;
   featured: boolean;
   published: boolean;
 }
 
-export async function createProperty(data: PropertyFormData): Promise<{ error?: string }> {
+
+export async function createPropertyDraft(condition: PropertyCondition = "ready"): Promise<{ id?: string; error?: string }> {
   const supabase = createServiceClient();
-  const { error } = await supabase.from("properties").insert(data as never);
+  const { data: row, error } = await supabase
+    .from("properties")
+    .insert({
+      title: condition === "off_plan" ? "New Off-Plan Project" : "New Property",
+      slug: `draft-${Date.now()}`,
+      type: "apartment",
+      availability: "for_sale",
+      condition,
+      price: 0,
+      currency: "OMR",
+      emirate: "Muscat",
+      amenities: [],
+      published: false,
+      featured: false,
+    } as never)
+    .select("id")
+    .single();
+  if (error) return { error: error.message };
+  return { id: (row as { id: string }).id };
+}
+
+export async function createProperty(data: PropertyFormData): Promise<{ error?: string; id?: string }> {
+  const supabase = createServiceClient();
+  const { data: row, error } = await supabase
+    .from("properties")
+    .insert(data as never)
+    .select("id")
+    .single();
   if (error) return { error: error.message };
   revalidatePath("/admin/properties");
+  revalidatePath("/admin/off-plan");
   revalidatePath("/properties");
-  return {};
+  return { id: (row as { id: string }).id };
 }
 
 export async function updateProperty(id: string, data: PropertyFormData): Promise<{ error?: string }> {
@@ -107,6 +148,29 @@ export async function deletePropertyImage(id: string, storagePath: string): Prom
   if (error) return { error: error.message };
   revalidatePath(`/admin/properties`);
   revalidatePath(`/properties`);
+  return {};
+}
+
+export async function saveAgentPhoto(id: string, path: string | null): Promise<{ error?: string }> {
+  const supabase = createServiceClient();
+  const { error } = await supabase
+    .from("properties")
+    .update({ agent_photo_path: path } as never)
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath(`/properties`);
+  return {};
+}
+
+export async function saveOffPlanExtras(id: string, extras: OffPlanExtras): Promise<{ error?: string }> {
+  const supabase = createServiceClient();
+  const { error } = await supabase
+    .from("properties")
+    .update(extras as never)
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/off-plan");
+  revalidatePath("/off-plan");
   return {};
 }
 

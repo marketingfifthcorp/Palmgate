@@ -4,7 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import PropertyForm from "@/components/admin/PropertyForm";
 import PropertyImageUploader from "@/components/admin/PropertyImageUploader";
-import { updateProperty } from "@/app/(admin)/admin/actions";
+import { updateProperty, saveAgentPhoto } from "@/app/(admin)/admin/actions";
 
 type Params = Promise<{ id: string }>;
 
@@ -29,6 +29,11 @@ export default async function EditPropertyPage({ params }: { params: Params }) {
     return updateProperty(id, data);
   }
 
+  async function agentPhotoAction(path: string | null) {
+    "use server";
+    return saveAgentPhoto(id, path);
+  }
+
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -50,6 +55,8 @@ export default async function EditPropertyPage({ params }: { params: Params }) {
         <PropertyForm
           initial={property as never}
           action={action}
+          propertyId={id}
+          onSaveAgentPhoto={agentPhotoAction}
         />
       </div>
     </div>

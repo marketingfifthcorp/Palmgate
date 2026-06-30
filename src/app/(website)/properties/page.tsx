@@ -15,7 +15,7 @@ import { Map } from "lucide-react";
 export const metadata: Metadata = {
   title: "Properties | Palmgate",
   description:
-    "Browse luxury apartments, villas, townhouses, and off-plan developments across Dubai.",
+    "Browse luxury apartments, villas, townhouses, and off-plan developments across Oman.",
 };
 
 type SP = Record<string, string | string[] | undefined>;
@@ -30,7 +30,7 @@ function pageTitle(availability?: string | null, condition?: string | null, type
   const typeLabel = type ? type.charAt(0).toUpperCase() + type.slice(1) + "s" : base;
   const availLabel =
     availability === "for_sale" ? " for Sale" : availability === "for_rent" ? " for Rent" : "";
-  return `${typeLabel}${availLabel} in Dubai`;
+  return `${typeLabel}${availLabel} in Oman`;
 }
 
 type PropertyRow = {
@@ -65,7 +65,11 @@ export default async function PropertiesPage({
   const condition = str(params, "condition") as PropertyCondition | undefined;
   const minPrice = str(params, "min_price");
   const maxPrice = str(params, "max_price");
-  const beds = str(params, "beds");
+  const beds     = str(params, "beds");
+  const baths    = str(params, "baths");
+  const minSize  = str(params, "min_size");
+  const maxSize  = str(params, "max_size");
+  const amenitiesParam = str(params, "amenities");
   const community = str(params, "community");
   const q = str(params, "q");
   const sort = str(params, "sort") ?? "featured";
@@ -89,14 +93,21 @@ export default async function PropertiesPage({
       .eq("published", true)
       .range(offset, offset + limit - 1);
 
-    if (type) query = query.eq("type", type);
+    if (type)       query = query.eq("type", type);
     if (availability) query = query.eq("availability", availability);
-    if (condition) query = query.eq("condition", condition);
-    if (minPrice) query = query.gte("price", parseFloat(minPrice));
-    if (maxPrice) query = query.lte("price", parseFloat(maxPrice));
-    if (beds) query = query.eq("bedrooms", parseInt(beds));
-    if (community) query = query.ilike("community", `%${community}%`);
-    if (q) query = query.textSearch("fts", q, { type: "websearch" });
+    if (condition)  query = query.eq("condition", condition);
+    if (minPrice)   query = query.gte("price",    parseFloat(minPrice));
+    if (maxPrice)   query = query.lte("price",    parseFloat(maxPrice));
+    if (beds)       query = query.gte("bedrooms", parseInt(beds));
+    if (baths)      query = query.gte("bathrooms", parseInt(baths));
+    if (minSize)    query = query.gte("area_sqft", parseFloat(minSize));
+    if (maxSize)    query = query.lte("area_sqft", parseFloat(maxSize));
+    if (amenitiesParam) {
+      const list = amenitiesParam.split(",").filter(Boolean);
+      if (list.length) query = query.contains("amenities", list);
+    }
+    if (community)  query = query.ilike("community", `%${community}%`);
+    if (q)          query = query.textSearch("fts", q, { type: "websearch" });
 
     switch (sort) {
       case "price_asc":  query = query.order("price", { ascending: true }); break;

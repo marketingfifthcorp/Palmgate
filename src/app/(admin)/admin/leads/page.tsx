@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = Promise<{ status?: string; source?: string }>;
+type SearchParams = Promise<{ source?: string }>;
 
 const SOURCE_LABELS: Record<string, string> = {
   contact_form: "Contact Form",
@@ -21,10 +21,8 @@ const STATUS_STYLE: Record<LeadStatus, string> = {
   lost: "bg-gray-100 text-gray-500 border-gray-200",
 };
 
-const STATUSES: LeadStatus[] = ["new", "contacted", "qualified", "lost"];
-
 export default async function AdminLeadsPage({ searchParams }: { searchParams: SearchParams }) {
-  const { status: statusFilter, source: sourceFilter } = await searchParams;
+  const { source: sourceFilter } = await searchParams;
   const supabase = await createClient();
 
   let query = supabase
@@ -32,9 +30,6 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
     .select("id, name, email, phone, source, status, message, created_at")
     .order("created_at", { ascending: false });
 
-  if (statusFilter && STATUSES.includes(statusFilter as LeadStatus)) {
-    query = query.eq("status", statusFilter as LeadStatus);
-  }
   if (sourceFilter) {
     query = query.eq("source", sourceFilter as LeadSource);
   }
@@ -43,7 +38,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
 
   function filterLink(params: Record<string, string | undefined>) {
     const sp = new URLSearchParams();
-    const merged = { status: statusFilter, source: sourceFilter, ...params };
+    const merged = { source: sourceFilter, ...params };
     Object.entries(merged).forEach(([k, v]) => { if (v) sp.set(k, v); });
     const s = sp.toString();
     return `/admin/leads${s ? `?${s}` : ""}`;
@@ -60,30 +55,6 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-6">
-        <Link
-          href={filterLink({ status: undefined })}
-          className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
-            !statusFilter
-              ? "bg-pg-dark text-white border-pg-dark"
-              : "border-gray-200 text-pg-muted hover:border-gray-300"
-          }`}
-        >
-          All statuses
-        </Link>
-        {STATUSES.map((s) => (
-          <Link
-            key={s}
-            href={filterLink({ status: s })}
-            className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors capitalize ${
-              statusFilter === s
-                ? "bg-pg-dark text-white border-pg-dark"
-                : "border-gray-200 text-pg-muted hover:border-gray-300"
-            }`}
-          >
-            {s}
-          </Link>
-        ))}
-        <span className="w-px bg-gray-200 mx-1" />
         <Link
           href={filterLink({ source: undefined })}
           className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors ${
@@ -180,7 +151,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
         <div className="bg-white border border-gray-100 rounded-2xl p-16 text-center">
           <p className="font-heading font-semibold text-pg-dark mb-1">No leads found</p>
           <p className="text-pg-muted text-sm">
-            {statusFilter || sourceFilter ? "Try removing filters." : "Leads will appear here once submitted."}
+            {sourceFilter ? "Try removing filters." : "Leads will appear here once submitted."}
           </p>
         </div>
       )}

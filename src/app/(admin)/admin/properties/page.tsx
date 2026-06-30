@@ -11,15 +11,16 @@ export default async function AdminPropertiesPage() {
   const { data: properties } = await supabase
     .from("properties")
     .select("id, title, type, availability, condition, price, currency, community, published, featured, created_at")
+    .neq("condition", "off_plan")
     .order("created_at", { ascending: false });
 
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-heading font-semibold text-2xl text-pg-dark">Properties</h1>
+          <h1 className="font-heading font-semibold text-2xl text-pg-dark">Listings</h1>
           <p className="text-pg-muted text-sm mt-0.5">
-            {properties?.length ?? 0} total
+            {properties?.length ?? 0} ready properties
           </p>
         </div>
         <Link

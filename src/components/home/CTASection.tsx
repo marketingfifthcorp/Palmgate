@@ -8,16 +8,33 @@ type Interest = "Buy" | "Sell" | "Rent" | "Invest";
 const INTERESTS: Interest[] = ["Buy", "Sell", "Rent", "Invest"];
 
 const AREAS = [
-  "Downtown Dubai", "Dubai Marina", "Palm Jumeirah", "Business Bay",
-  "Jumeirah Village Circle", "Arabian Ranches", "Dubai Hills Estate", "Jumeirah",
+  "Muscat Hills",
+  "Al Mouj (The Wave)",
+  "Shatti Al Qurum",
+  "Madinat Al Sultan Qaboos",
+  "Al Khuwair",
+  "Bausher",
+  "Qurum",
+  "Muttrah",
+  "Salalah",
+  "Duqm",
 ];
 
 const BUDGETS = [
-  "Under AED 1M", "AED 1M – 2M", "AED 2M – 5M", "AED 5M – 10M", "AED 10M+",
+  "Under OMR 50K",
+  "OMR 50K – 100K",
+  "OMR 100K – 200K",
+  "OMR 200K – 500K",
+  "OMR 500K+",
 ];
 
-export default function CTASection() {
+interface Props {
+  initialLand?: boolean;
+}
+
+export default function CTASection({ initialLand = false }: Props) {
   const [interest, setInterest] = useState<Interest>("Buy");
+  const [landChecked, setLandChecked] = useState(initialLand);
   const [submitted, setSubmitted] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
@@ -40,7 +57,7 @@ export default function CTASection() {
             </h2>
             <p className="text-pg-body text-[15px] leading-relaxed mb-8 max-w-sm">
               Tell us what you&apos;re looking for and our team will help you find
-              the right opportunity. Whether you&apos;re searching for a home,
+              the right opportunity in Oman. Whether you&apos;re searching for a home,
               listing a property, or exploring investment options, we&apos;re here
               to guide you.
             </p>
@@ -58,7 +75,7 @@ export default function CTASection() {
               <div className="flex flex-col items-center justify-center py-14 gap-4 text-center">
                 <CheckCircle2 size={44} className="text-emerald-500" />
                 <h3 className="font-heading text-xl text-pg-dark">Thank you!</h3>
-                <p className="text-pg-muted text-sm">We'll be in touch within 24 hours.</p>
+                <p className="text-pg-muted text-sm">We&apos;ll be in touch within 24 hours.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -100,7 +117,7 @@ export default function CTASection() {
                   />
                 </div>
 
-                {/* Interest radios */}
+                {/* Interest radios + Land checkbox */}
                 <div>
                   <label className="block text-[11px] font-semibold text-pg-dark uppercase tracking-wide mb-2.5">
                     I&apos;m Interested In
@@ -119,6 +136,16 @@ export default function CTASection() {
                         <span className="text-[13px] text-pg-body">{opt}</span>
                       </label>
                     ))}
+                    {/* Land — circle toggle matching radio look */}
+                    <label
+                      className="flex items-center gap-2 cursor-pointer"
+                      onClick={() => setLandChecked((v) => !v)}
+                    >
+                      <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${landChecked ? "border-pg-dark" : "border-gray-400"}`}>
+                        {landChecked && <span className="w-2 h-2 rounded-full bg-pg-dark block" />}
+                      </span>
+                      <span className="text-[13px] text-pg-body">Land &amp; Investment</span>
+                    </label>
                   </div>
                 </div>
 

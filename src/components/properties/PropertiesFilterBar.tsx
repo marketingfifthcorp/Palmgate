@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
 import PropertiesFilterModal from "./PropertiesFilterModal";
+import ActiveFilters from "./ActiveFilters";
 
 const TYPE_LABELS: Record<string, string> = {
   apartment: "Apartment", villa: "Villa", townhouse: "Townhouse",
@@ -14,13 +15,13 @@ function formatPriceLabel(min: string, max: string): string {
   if (!min && !max) return "Price";
   const fmt = (v: string) => {
     const n = parseFloat(v);
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(0)}M`;
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
     return v;
   };
-  if (min && max) return `AED ${fmt(min)} – ${fmt(max)}`;
-  if (min) return `From AED ${fmt(min)}`;
-  return `Up to AED ${fmt(max)}`;
+  if (min && max) return `OMR ${fmt(min)} – ${fmt(max)}`;
+  if (min) return `From OMR ${fmt(min)}`;
+  return `Up to OMR ${fmt(max)}`;
 }
 
 function bedsLabel(beds: string): string {
@@ -29,27 +30,30 @@ function bedsLabel(beds: string): string {
   return `${beds}+ Beds`;
 }
 
-interface Props {
-  total: number;
-}
+interface Props { total: number }
 
 export default function PropertiesFilterBar({ total }: Props) {
   const router   = useRouter();
   const pathname = usePathname();
   const sp       = useSearchParams();
+
   const [q, setQ]           = useState(sp.get("q") ?? "");
   const [modalOpen, setModalOpen] = useState(false);
+  const [openKey,   setOpenKey]   = useState(0); // increments on each open → remounts modal
 
   const availability = sp.get("availability") ?? "";
-  const type    = sp.get("type") ?? "";
-  const minPrice = sp.get("min_price") ?? "";
-  const maxPrice = sp.get("max_price") ?? "";
-  const beds    = sp.get("beds") ?? "";
+  const type      = sp.get("type") ?? "";
+  const minPrice  = sp.get("min_price") ?? "";
+  const maxPrice  = sp.get("max_price") ?? "";
+  const beds      = sp.get("beds") ?? "";
 
-  // Count active non-search filters
-  const activeCount = [type, minPrice, maxPrice, beds,
-    sp.get("baths"), sp.get("condition"), sp.get("ownership"), sp.get("amenities")]
-    .filter(Boolean).length;
+  // Count active filters that are actually sent to the backend
+  const activeCount = [
+    type, minPrice, maxPrice, beds,
+    sp.get("baths"), sp.get("condition"),
+    sp.get("min_size"), sp.get("max_size"),
+    sp.get("amenities"),
+  ].filter(Boolean).length;
 
   function updateParam(key: string, value: string) {
     const p = new URLSearchParams(sp.toString());
@@ -63,7 +67,12 @@ export default function PropertiesFilterBar({ total }: Props) {
     updateParam("q", q);
   }
 
-  const btnCls = "flex items-center gap-1.5 text-[13px] text-pg-dark hover:text-pg-gold transition-colors whitespace-nowrap shrink-0";
+  function openModal() {
+    setOpenKey((k) => k + 1); // remount modal so it reads fresh URL params
+    setModalOpen(true);
+  }
+
+  const btnCls   = "flex items-center gap-1.5 text-[13px] text-pg-dark hover:text-pg-gold transition-colors whitespace-nowrap shrink-0";
   const activeDot = "inline-block w-1.5 h-1.5 rounded-full bg-pg-gold ml-0.5";
 
   return (
@@ -74,14 +83,14 @@ export default function PropertiesFilterBar({ total }: Props) {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center h-14 gap-3">
 
-            {/* Buy / Rent */}
+            {/* Availability */}
             <div className="flex items-center gap-1 shrink-0">
               <select
                 value={availability}
                 onChange={(e) => updateParam("availability", e.target.value)}
                 className="text-[13px] font-semibold text-pg-dark bg-transparent focus:outline-none cursor-pointer appearance-none"
               >
-                <option value="">Buy</option>
+                <option value="">All</option>
                 <option value="for_sale">For Sale</option>
                 <option value="for_rent">For Rent</option>
               </select>
@@ -90,9 +99,11 @@ export default function PropertiesFilterBar({ total }: Props) {
 
             <span className="h-5 w-px bg-gray-200 shrink-0" />
 
-            {/* Search */}
+            {/* Search — submits on Enter */}
             <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 min-w-0">
-              <Search size={14} className="text-pg-muted shrink-0" />
+              <button type="submit" className="text-pg-muted hover:text-pg-gold transition-colors shrink-0">
+                <Search size={14} />
+              </button>
               <input
                 type="text"
                 value={q}
@@ -105,7 +116,7 @@ export default function PropertiesFilterBar({ total }: Props) {
             <span className="h-5 w-px bg-gray-200 shrink-0" />
 
             {/* Property Type */}
-            <button onClick={() => setModalOpen(true)} className={btnCls}>
+            <button onClick={openModal} className={btnCls}>
               {type ? <span className="font-medium">{TYPE_LABELS[type] ?? type}</span> : "Property Type"}
               {type && <span className={activeDot} />}
             </button>
@@ -113,9 +124,9 @@ export default function PropertiesFilterBar({ total }: Props) {
             <span className="h-5 w-px bg-gray-200 shrink-0" />
 
             {/* Price */}
-            <button onClick={() => setModalOpen(true)} className={btnCls}>
+            <button onClick={openModal} className={btnCls}>
               {(minPrice || maxPrice)
-                ? <span className="font-medium ">{formatPriceLabel(minPrice, maxPrice)}</span>
+                ? <span className="font-medium">{formatPriceLabel(minPrice, maxPrice)}</span>
                 : "Price"}
               {(minPrice || maxPrice) && <span className={activeDot} />}
             </button>
@@ -123,7 +134,7 @@ export default function PropertiesFilterBar({ total }: Props) {
             <span className="h-5 w-px bg-gray-200 shrink-0" />
 
             {/* Beds */}
-            <button onClick={() => setModalOpen(true)} className={btnCls}>
+            <button onClick={openModal} className={btnCls}>
               {beds ? <span className="font-medium">{bedsLabel(beds)}</span> : "Beds"}
               {beds && <span className={activeDot} />}
             </button>
@@ -132,7 +143,7 @@ export default function PropertiesFilterBar({ total }: Props) {
 
             {/* More Filters */}
             <button
-              onClick={() => setModalOpen(true)}
+              onClick={openModal}
               className="flex items-center gap-1.5 text-[13px] font-medium text-pg-dark hover:text-pg-gold transition-colors shrink-0 whitespace-nowrap"
             >
               <SlidersHorizontal size={14} />
@@ -166,10 +177,14 @@ export default function PropertiesFilterBar({ total }: Props) {
           </div>
         </div>
 
+        {/* Active filter chips — only renders when filters are applied */}
+        <ActiveFilters />
+
       </div>
 
-      {/* Filter modal */}
+      {/* Filter modal — key increments on open so it remounts with fresh URL state */}
       <PropertiesFilterModal
+        key={openKey}
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         total={total}
