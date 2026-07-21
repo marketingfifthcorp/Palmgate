@@ -3,6 +3,7 @@ import Hero from "@/components/home/Hero";
 import StatsBar from "@/components/home/StatsBar";
 import OffPlanSection from "@/components/home/OffPlanSection";
 import MortgageSection from "@/components/home/MortgageSection";
+import MarketsSection from "@/components/home/MarketsSection";
 import ExclusivePropertiesSection from "@/components/home/ExclusivePropertiesSection";
 import PrivateOfficeSection from "@/components/home/PrivateOfficeSection";
 import PropertyTypesGrid from "@/components/home/PropertyTypesGrid";
@@ -29,10 +30,11 @@ export default function HomePage() {
       <Hero />
       {/* <StatsBar /> */}
       <OffPlanSection />
-      <MortgageSection />
+      <MarketsSection />
       <ExclusivePropertiesSection />
       <PrivateOfficeSection />
       <PropertyTypesGrid />
+      <MortgageSection />
       <ForAgentsSection />
       <ServicesSection />
       <CTASection />

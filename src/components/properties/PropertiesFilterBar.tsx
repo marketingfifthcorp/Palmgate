@@ -84,17 +84,17 @@ export default function PropertiesFilterBar({ total }: Props) {
           <div className="flex items-center h-14 gap-3">
 
             {/* Availability */}
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="relative flex items-center shrink-0">
               <select
                 value={availability}
                 onChange={(e) => updateParam("availability", e.target.value)}
-                className="text-[13px] font-semibold text-pg-dark bg-transparent focus:outline-none cursor-pointer appearance-none"
+                className="text-[13px] font-semibold text-pg-dark bg-transparent focus:outline-none cursor-pointer appearance-none pr-4"
               >
                 <option value="">All</option>
                 <option value="for_sale">For Sale</option>
                 <option value="for_rent">For Rent</option>
               </select>
-              <ChevronDown size={13} className="text-pg-muted shrink-0" />
+              <ChevronDown size={13} className="absolute right-0 text-pg-muted pointer-events-none" />
             </div>
 
             <span className="h-5 w-px bg-gray-200 shrink-0" />

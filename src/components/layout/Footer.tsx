@@ -18,10 +18,6 @@ const LINKS = {
     { label: "Careers", href: "/careers" },
     { label: "Latest News", href: "/insights" },
   ],
-  "Our Offices": [
-    { label: "Muscat Office", href: "/contact" },
-    { label: "Salalah Office", href: "/contact" },
-  ],
 };
 
 const SOCIAL = [
@@ -97,7 +93,7 @@ export default function Footer() {
         </div>
 
         {/* Link columns */}
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 gap-8">
           {Object.entries(LINKS).map(([section, links]) => (
             <div key={section}>
               <h4 className="text-xs font-semibold uppercase tracking-widest text-pg-muted mb-4">

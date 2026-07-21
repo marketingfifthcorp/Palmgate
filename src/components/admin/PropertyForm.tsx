@@ -284,14 +284,9 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
           </div>
           <div>
             <label className={labelClass}>Condition *</label>
-            {isOffPlan ? (
-              <div className={inputClass + " bg-gray-50 text-pg-muted cursor-not-allowed"}>Off-Plan</div>
-            ) : (
-              <select value={f.condition} onChange={(e) => set("condition", e.target.value as PropertyCondition)} className={inputClass + " bg-white"}>
-                <option value="ready">Ready</option>
-                <option value="off_plan">Off-Plan</option>
-              </select>
-            )}
+            <div className={inputClass + " bg-gray-50 text-pg-muted cursor-not-allowed"}>
+              {isOffPlan ? "Off-Plan" : "Ready"}
+            </div>
           </div>
         </div>
       </section>

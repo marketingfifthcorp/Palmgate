@@ -16,14 +16,18 @@ export default async function AdminDashboardPage() {
   const supabase = await createClient();
 
   const [
-    { count: totalProperties },
-    { count: publishedProperties },
+    { count: offPlanTotal },
+    { count: offPlanPublished },
+    { count: readyTotal },
+    { count: readyPublished },
     { count: totalLeads },
     { count: newLeads },
     { data: recentLeads },
   ] = await Promise.all([
-    supabase.from("properties").select("*", { count: "exact", head: true }),
-    supabase.from("properties").select("*", { count: "exact", head: true }).eq("published", true),
+    supabase.from("properties").select("*", { count: "exact", head: true }).eq("condition", "off_plan"),
+    supabase.from("properties").select("*", { count: "exact", head: true }).eq("condition", "off_plan").eq("published", true),
+    supabase.from("properties").select("*", { count: "exact", head: true }).eq("condition", "ready"),
+    supabase.from("properties").select("*", { count: "exact", head: true }).eq("condition", "ready").eq("published", true),
     supabase.from("leads").select("*", { count: "exact", head: true }),
     supabase.from("leads").select("*", { count: "exact", head: true }).eq("status", "new"),
     supabase
@@ -35,9 +39,16 @@ export default async function AdminDashboardPage() {
 
   const STATS = [
     {
-      label: "Total Properties",
-      value: totalProperties ?? 0,
-      sub: `${publishedProperties ?? 0} published`,
+      label: "Off-Plan Properties",
+      value: offPlanTotal ?? 0,
+      sub: `${offPlanPublished ?? 0} published`,
+      icon: Building2,
+      href: "/admin/off-plan",
+    },
+    {
+      label: "Secondary Listings",
+      value: readyTotal ?? 0,
+      sub: `${readyPublished ?? 0} published`,
       icon: Building2,
       href: "/admin/properties",
     },
@@ -65,7 +76,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid sm:grid-cols-3 gap-4 mb-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {STATS.map(({ label, value, sub, icon: Icon, href }) => (
           <Link
             key={label}

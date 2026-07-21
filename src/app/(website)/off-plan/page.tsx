@@ -2,9 +2,10 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, BedDouble, Calendar } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicUrl } from "@/lib/supabase/storage";
+import { WHATSAPP_NUMBER } from "@/lib/off-plan-data";
 import OffPlanFilterBar from "@/components/off-plan/OffPlanFilterBar";
 
 export const dynamic = "force-dynamic";
@@ -139,13 +140,9 @@ export default async function OffPlanPage({
                 if (p.availability === "for_sale")    tags.push("FOR SALE");
 
                 return (
-                  <Link
-                    key={p.id}
-                    href={`/off-plan/${p.slug}`}
-                    className="group flex flex-col bg-white overflow-hidden rounded-sm border border-gray-100 hover:shadow-md transition-shadow"
-                  >
+                  <div key={p.id} className="flex flex-col bg-transparent rounded-sm overflow-hidden">
                     {/* Image */}
-                    <div className="relative aspect-4/3 overflow-hidden bg-gray-100">
+                    <Link href={`/off-plan/${p.slug}`} className="relative block aspect-3/2 overflow-hidden group">
                       {imageUrl ? (
                         <Image
                           src={imageUrl}
@@ -162,10 +159,8 @@ export default async function OffPlanPage({
                           {tags.map((tag) => (
                             <span
                               key={tag}
-                              className={`text-[10px] font-semibold px-2 py-1 ${
-                                tag === "FEATURED"
-                                  ? "bg-pg-gold text-white"
-                                  : "bg-sky-500 text-white"
+                              className={`text-[10px] font-semibold px-2 py-1 rounded-sm ${
+                                tag === "FEATURED" ? "bg-pg-gold text-white" : "bg-sky-500 text-white"
                               }`}
                             >
                               {tag}
@@ -173,44 +168,65 @@ export default async function OffPlanPage({
                           ))}
                         </div>
                       )}
-                    </div>
+                    </Link>
 
-                    {/* Body */}
+                    {/* Card body */}
                     <div className="flex flex-col flex-1 p-4">
-                      <p className="text-xl font-bold text-pg-dark mb-1 leading-tight">
-                        {formatPrice(p.price, p.currency)}
-                      </p>
+                      <h3 className="font-sans font-bold text-pg-dark text-base uppercase tracking-wide leading-tight mb-1">
+                        {p.title}
+                      </h3>
+                      <p className="text-pg-body text-sm mb-1 capitalize">{p.type ?? "Residential"}</p>
+                      {p.developer && <p className="text-pg-muted text-xs mb-1">{p.developer}</p>}
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 mb-4 group/loc w-fit"
+                      >
+                        <MapPin size={11} className="text-pg-muted shrink-0" />
+                        <span className="text-xs text-pg-muted group-hover/loc:underline">{location}</span>
+                      </a>
 
-                      <p className="text-[13px] text-pg-muted mb-2 capitalize">
-                        {p.type ?? "Residential"}{p.completion_date ? ` · Handover ${formatHandover(p.completion_date)}` : ""}
-                      </p>
-
-                      <div className="flex items-center gap-1 mb-4">
-                        <MapPin size={12} className="text-pg-muted shrink-0" />
-                        <span className="text-[13px] text-pg-muted truncate">{location}</span>
+                      {/* Stats bar */}
+                      <div className="mt-auto border rounded-sm border-gray-800 divide-x divide-gray-800 py-2 grid grid-cols-3 text-center mb-3">
+                        <div className="px-2.5">
+                          <p className="text-[10px] text-pg-muted mb-0.5">Starting Price</p>
+                          <p className="text-xs font-semibold text-pg-dark">{formatPrice(p.price, p.currency)}</p>
+                        </div>
+                        <div className="px-2.5">
+                          <p className="text-[10px] text-pg-muted mb-0.5">Bedrooms</p>
+                          <p className="text-xs font-semibold text-pg-dark">
+                            {p.bedrooms != null ? (p.bedrooms === 0 ? "Studio" : `${p.bedrooms} BR`) : "TBA"}
+                          </p>
+                        </div>
+                        <div className="px-2.5">
+                          <p className="text-[10px] text-pg-muted mb-0.5">Handover</p>
+                          <p className="text-xs font-semibold text-pg-dark">{formatHandover(p.completion_date)}</p>
+                        </div>
                       </div>
 
-                      <div className="mt-auto flex items-center gap-4 text-[12px] text-pg-muted">
-                        {p.bedrooms != null && (
-                          <span className="flex items-center gap-1">
-                            <BedDouble size={13} className="shrink-0" />
-                            {p.bedrooms === 0 ? "Studio" : `${p.bedrooms} BR`}
-                          </span>
-                        )}
-                        {p.completion_date && (
-                          <span className="flex items-center gap-1">
-                            <Calendar size={13} className="shrink-0" />
-                            {formatHandover(p.completion_date)}
-                          </span>
-                        )}
-                        {p.developer && (
-                          <span className="ml-auto text-[11px] font-medium text-pg-dark truncate max-w-25">
-                            {p.developer}
-                          </span>
-                        )}
+                      {/* Action buttons */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <a
+                          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi, I am interested in ${p.title}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 bg-[#25D366] text-white text-xs font-semibold py-2.5 rounded-sm hover:bg-[#1ebe5d] transition-colors"
+                        >
+                          <svg viewBox="0 0 32 32" fill="currentColor" className="w-3.5 h-3.5">
+                            <path d="M16 0C7.163 0 0 7.163 0 16c0 2.836.74 5.5 2.035 7.818L0 32l8.385-2.012A15.93 15.93 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm8.07 22.514c-.334.94-1.956 1.796-2.685 1.91-.686.107-1.553.152-2.505-.158-.578-.19-1.32-.443-2.27-.868-3.996-1.727-6.606-5.76-6.804-6.027-.198-.267-1.615-2.148-1.615-4.098s1.02-2.91 1.382-3.307c.362-.397.79-.497 1.054-.497.264 0 .528.002.76.014.244.012.57-.093.893.68.333.795 1.13 2.745 1.229 2.943.1.198.165.43.033.694-.133.265-.199.43-.396.661-.198.232-.416.518-.594.696-.198.198-.404.413-.174.81.23.397 1.023 1.688 2.197 2.734 1.508 1.34 2.78 1.754 3.177 1.952.397.199.628.166.858-.1.231-.265.99-1.155 1.254-1.552.264-.397.528-.33.89-.199.362.132 2.308 1.088 2.705 1.287.397.198.661.297.76.463.099.166.099.963-.235 1.903z" />
+                          </svg>
+                          WhatsApp
+                        </a>
+                        <Link
+                          href={`/off-plan/${p.slug}`}
+                          className="flex items-center justify-center text-xs font-semibold text-pg-dark border border-pg-dark py-2.5 rounded-sm hover:bg-pg-dark hover:text-white transition-colors"
+                        >
+                          View Details
+                        </Link>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 );
               })}
             </div>

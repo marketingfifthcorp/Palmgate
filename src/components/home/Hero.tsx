@@ -131,7 +131,7 @@ export default function Hero() {
             Masks the baked-in navbar that's part of the original video footage
             and gives our transparent Palmgate navbar a dark ground to sit on.
         ──────────────────────────────────────────────────────────────────── */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-linear-to-b from-black/80 via-black/35 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-36 bg-linear-to-b from-black via-black/60 to-transparent pointer-events-none" />
 
         {/* ── Bottom gradient ───────────────────────────────────────────────
             Keeps the heading and search widget legible against any frame.

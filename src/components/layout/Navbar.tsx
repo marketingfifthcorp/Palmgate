@@ -54,9 +54,7 @@ export default function Navbar() {
               width={140}
               height={36}
               priority
-              className={`h-9 w-auto object-contain transition-all duration-500 ${
-                transparent ? "brightness-100" : "brightness-[0.65]"
-              }`}
+              className={`h-9 w-auto object-contain transition-[filter] duration-500 ${transparent ? "brightness-0 invert" : ""}`}
             />
           </Link>
 
@@ -79,7 +77,7 @@ export default function Navbar() {
             <span className={`w-px h-4 transition-colors duration-300 ${transparent ? "bg-white/30" : "bg-gray-200"}`} />
 
             <Link
-              href="/sell-with-us"
+              href="/contact"
               className={`text-[13px] font-medium transition-colors duration-300 whitespace-nowrap ${
                 transparent
                   ? "text-white/85 hover:text-white"
@@ -89,46 +87,6 @@ export default function Navbar() {
               List your property
             </Link>
 
-            <button
-              className={`flex items-center gap-1.5 text-[13px] font-medium transition-colors duration-300 ${
-                transparent
-                  ? "text-white/85 hover:text-white"
-                  : "text-pg-dark/75 hover:text-pg-dark"
-              }`}
-              aria-label="Select currency"
-            >
-              <Globe size={14} />
-              OMR
-              <ChevronDown size={12} />
-            </button>
-
-            <button
-              className={`transition-colors duration-300 ${
-                transparent ? "text-white/85 hover:text-white" : "text-pg-dark/75 hover:text-pg-dark"
-              }`}
-              aria-label="Search"
-            >
-              <Search size={17} />
-            </button>
-
-            <button
-              className={`transition-colors duration-300 ${
-                transparent ? "text-white/85 hover:text-white" : "text-pg-dark/75 hover:text-pg-dark"
-              }`}
-              aria-label="Account"
-            >
-              <User size={17} />
-            </button>
-
-            <button
-              aria-label="Open menu"
-              onClick={() => setMenuOpen(true)}
-              className={`transition-colors duration-300 ${
-                transparent ? "text-white/85 hover:text-white" : "text-pg-dark/75 hover:text-pg-dark"
-              }`}
-            >
-              <Menu size={20} />
-            </button>
           </div>
 
           {/* Mobile burger */}
@@ -187,7 +145,7 @@ export default function Navbar() {
             </Link>
           ))}
           <Link
-            href="/sell-with-us"
+            href="/contact"
             onClick={() => setMenuOpen(false)}
             className="text-[15px] font-medium text-pg-dark py-3 border-b border-gray-50 hover:text-pg-gold transition-colors"
           >

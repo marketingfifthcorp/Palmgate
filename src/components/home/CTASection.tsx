@@ -112,7 +112,7 @@ export default function CTASection({ initialLand = false }: Props) {
                   </label>
                   <input
                     type="tel"
-                    placeholder="Enter your phone number"
+                    placeholder="+968 XXXX XXXX"
                     className="w-full border border-gray-200 rounded-lg px-4 py-3 text-[13px] text-pg-body placeholder:text-pg-muted focus:outline-none focus:border-pg-dark transition-colors"
                   />
                 </div>

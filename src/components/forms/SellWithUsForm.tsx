@@ -74,7 +74,7 @@ export default function SellWithUsForm() {
         <div>
           <label className={labelCls}>Phone Number</label>
           <input type="tel" required value={form.phone} onChange={(e) => set("phone", e.target.value)}
-            placeholder="+971 XXXX XXXX" className={inputCls} />
+            placeholder="+968 XXXX XXXX" className={inputCls} />
         </div>
         <div>
           <label className={labelCls}>Email Address</label>

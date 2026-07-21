@@ -74,22 +74,27 @@ export default function OffPlanSection() {
                 </h3>
                 <p className="text-pg-body text-sm mb-1">{p.types}</p>
                 <p className="text-pg-muted text-xs mb-1">{p.developer}</p>
-                <div className="flex items-center gap-1 mb-4">
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 mb-4 group/loc w-fit"
+                >
                   <MapPin size={11} className="text-pg-muted shrink-0" />
-                  <span className="text-xs text-pg-muted">{p.location}</span>
-                </div>
+                  <span className="text-xs text-pg-muted group-hover/loc:underline">{p.location}</span>
+                </a>
 
                 {/* Stats bar */}
-                <div className="mt-auto border border-gray-200 rounded-sm divide-x divide-gray-200 grid grid-cols-3 text-center mb-3">
-                  <div className="p-2.5">
+                <div className="mt-auto border  rounded-sm  border-gray-800 divide-x divide-gray-800 py-2  grid grid-cols-3 text-center mb-3">
+                  <div className="px-2.5">
                     <p className="text-[10px] text-pg-muted mb-0.5">Starting Price</p>
                     <p className="text-xs font-semibold text-pg-dark">{p.startingPrice}</p>
                   </div>
-                  <div className="p-2.5">
+                  <div className="px-2.5">
                     <p className="text-[10px] text-pg-muted mb-0.5">Bedrooms</p>
                     <p className="text-xs font-semibold text-pg-dark">{p.bedrooms}</p>
                   </div>
-                  <div className="p-2.5">
+                  <div className="px-2.5">
                     <p className="text-[10px] text-pg-muted mb-0.5">Handover</p>
                     <p className="text-xs font-semibold text-pg-dark">{p.handover}</p>
                   </div>

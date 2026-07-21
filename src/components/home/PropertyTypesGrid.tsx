@@ -51,7 +51,7 @@ export default function PropertyTypesGrid() {
         <div className="flex items-end justify-between mb-10">
           <div>
             <h2 className="font-sans font-bold text-3xl md:text-4xl text-pg-dark uppercase tracking-wide">
-              Explore Properties By Type
+              Browse our top listings
             </h2>
           </div>
         </div>

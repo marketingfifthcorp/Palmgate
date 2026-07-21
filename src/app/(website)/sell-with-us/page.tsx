@@ -8,13 +8,13 @@ import CtaBannerWithModal from "@/components/sell-with-us/CtaBannerWithModal";
 export const metadata: Metadata = {
   title: "Sell With Us | Palmgate",
   description:
-    "Get the best value for your property in Dubai. Palmgate provides market valuation, premium marketing exposure, and expert negotiation to maximise your return.",
+    "Get the best value for your property in Dubai. Palmgate provides market consultation, premium marketing exposure, and expert negotiation to maximise your return.",
 };
 
 const FEATURES = [
   {
     icon: BarChart2,
-    title: "Accurate Property Valuation",
+    title: "Accurate Property Consultation",
     desc: "We provide a precise, data-backed assessment of your property's worth, ensuring a competitive yet profitable listing price.",
   },
   {
@@ -46,7 +46,7 @@ const FEATURES = [
 
 const STEPS = [
   { num: "01", title: "Property Review",       desc: "Initial consultation and detailed walkthrough to understand your property's unique selling points." },
-  { num: "02", title: "Market Valuation",      desc: "Comprehensive analysis of recent sales and market trends to establish a competitive asking price." },
+  { num: "02", title: "Market Consultation",      desc: "Comprehensive analysis of recent sales and market trends to establish a competitive asking price." },
   { num: "03", title: "Marketing Launch",      desc: "Execution of a bespoke marketing strategy, including professional media, digital campaigns, and targeted outreach." },
   { num: "04", title: "Buyer Viewings",        desc: "Coordination and hosting of private viewings with pre-qualified buyers to showcase the property." },
   { num: "05", title: "Offers & Negotiation", desc: "Expert handling of all offers, providing strategic advice to negotiate the best possible terms and price." },
@@ -83,10 +83,10 @@ export default function SellWithUsPage() {
           </p>
           <div className="flex flex-wrap gap-4">
             <a
-              href="#valuation-form"
+              href="#consultation-form"
               className="inline-flex items-center justify-center px-8 py-3.5 bg-white text-pg-dark text-[13px] font-semibold uppercase tracking-wider rounded hover:bg-white/90 transition-colors"
             >
-              Get a Free Valuation
+              Get a Free Consultation
             </a>
             <Link
               href="/contact"
@@ -173,7 +173,7 @@ export default function SellWithUsPage() {
       <CtaBannerWithModal />
 
       {/* ── CONTACT FORM ──────────────────────────────────────────── */}
-      <section className="bg-[#F4F4F2] py-20" id="valuation-form">
+      <section className="bg-[#F4F4F2] py-20" id="consultation-form">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-[1fr_580px] gap-12 items-start">
 

@@ -5,13 +5,14 @@ import { X } from "lucide-react";
 
 interface Props {
   projectName: string;
+  propertyId?: string;
   trigger?: "register" | "callback" | "brochure";
   label?: string;
   className?: string;
-  brochureUrl?: string; // if provided, download fires automatically after brochure lead is submitted
+  brochureUrl?: string;
 }
 
-export default function RegisterInterestModal({ projectName, trigger = "register", label, className, brochureUrl }: Props) {
+export default function RegisterInterestModal({ projectName, propertyId, trigger = "register", label, className, brochureUrl }: Props) {
   const [open, setOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -51,6 +52,7 @@ export default function RegisterInterestModal({ projectName, trigger = "register
             phone: form.phone,
             message: `${projectName} — ${titles[trigger]}. ${form.message}`.trim(),
             source: "off_plan_inquiry",
+            property_id: propertyId ?? null,
           }),
         });
         setSubmitted(true);
@@ -90,16 +92,14 @@ export default function RegisterInterestModal({ projectName, trigger = "register
 
       {/* Modal */}
       <div className={`fixed inset-0 z-70 flex items-center justify-center p-4 pointer-events-none transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0"}`}>
-        <div className={`relative w-full max-w-md bg-white rounded-2xl shadow-2xl pointer-events-auto transition-transform duration-300 ${open ? "scale-100" : "scale-95"}`}>
+        <div className={`relative w-full max-w-md bg-white rounded-2xl shadow-2xl transition-transform duration-300 ${open ? "pointer-events-auto scale-100" : "pointer-events-none scale-95"}`}>
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-            <div>
-              <h3 className="font-heading font-semibold text-pg-dark text-lg">{titles[trigger]}</h3>
-              <p className="text-pg-muted text-[12px] mt-0.5">{projectName}</p>
-            </div>
-            <button onClick={() => setOpen(false)} className="text-pg-muted hover:text-pg-dark transition-colors">
+          <div className="relative flex flex-col items-center text-center px-6 py-5 border-b border-gray-100">
+            <button onClick={() => setOpen(false)} className="absolute top-0 right-0 p-1 text-pg-muted hover:text-pg-dark transition-colors">
               <X size={20} />
             </button>
+            <h3 className="font-heading font-semibold text-pg-dark text-lg">{titles[trigger]}</h3>
+            <p className="text-pg-muted text-[12px] mt-0.5">{projectName}</p>
           </div>
 
           {/* Body */}
@@ -139,7 +139,7 @@ export default function RegisterInterestModal({ projectName, trigger = "register
                   <div>
                     <label className={labelCls}>Phone</label>
                     <input type="tel" required value={form.phone} onChange={(e) => set("phone", e.target.value)}
-                      placeholder="+971 XXXX XXXX" className={inputCls} />
+                      placeholder="+968 XXXX XXXX" className={inputCls} />
                   </div>
                   <div>
                     <label className={labelCls}>Email</label>

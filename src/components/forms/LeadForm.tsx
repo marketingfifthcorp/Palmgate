@@ -88,7 +88,7 @@ export default function LeadForm({
           type="tel"
           value={form.phone}
           onChange={(e) => update("phone", e.target.value)}
-          placeholder="+971 50 000 0000"
+          placeholder="+968 9 000 0000"
           className="w-full border border-[#DED8CE] bg-white rounded-lg px-3.5 py-2.5 text-sm text-pg-body placeholder:text-pg-muted focus:outline-none focus:border-pg-gold transition-colors"
         />
       </div>

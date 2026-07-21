@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import LeadStatusSelect from "@/components/admin/LeadStatusSelect";
-import type { LeadStatus, LeadSource } from "@/types/database";
+import LeadsTable from "@/components/admin/LeadsTable";
+import type { LeadSource } from "@/types/database";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -8,17 +8,11 @@ export const dynamic = "force-dynamic";
 type SearchParams = Promise<{ source?: string }>;
 
 const SOURCE_LABELS: Record<string, string> = {
-  contact_form: "Contact Form",
+  contact_form:     "Contact Form",
   property_inquiry: "Property Inquiry",
-  sell_with_us: "Sell With Us",
-  newsletter: "Newsletter",
-};
-
-const STATUS_STYLE: Record<LeadStatus, string> = {
-  new: "bg-blue-50 text-blue-600 border-blue-100",
-  contacted: "bg-yellow-50 text-yellow-700 border-yellow-100",
-  qualified: "bg-green-50 text-green-700 border-green-100",
-  lost: "bg-gray-100 text-gray-500 border-gray-200",
+  off_plan_inquiry: "Off-Plan Inquiry",
+  sell_with_us:     "Sell With Us",
+  newsletter:       "Newsletter",
 };
 
 export default async function AdminLeadsPage({ searchParams }: { searchParams: SearchParams }) {
@@ -27,7 +21,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
 
   let query = supabase
     .from("leads")
-    .select("id, name, email, phone, source, status, message, created_at")
+    .select("id, name, email, phone, source, status, message, created_at, property_id")
     .order("created_at", { ascending: false });
 
   if (sourceFilter) {
@@ -35,6 +29,19 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
   }
 
   const { data: leads } = await query;
+
+  // Batch-fetch property info for any leads that have a property_id
+  const propertyIds = [...new Set((leads ?? []).map((l) => l.property_id).filter(Boolean))] as string[];
+  let propertyMap: Record<string, { title: string; slug: string }> = {};
+  if (propertyIds.length > 0) {
+    const { data: props } = await supabase
+      .from("properties")
+      .select("id, title, slug")
+      .in("id", propertyIds);
+    if (props) {
+      propertyMap = Object.fromEntries(props.map((p) => [p.id, { title: p.title, slug: p.slug }]));
+    }
+  }
 
   function filterLink(params: Record<string, string | undefined>) {
     const sp = new URLSearchParams();
@@ -53,7 +60,7 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Source filters */}
       <div className="flex flex-wrap gap-2 mb-6">
         <Link
           href={filterLink({ source: undefined })}
@@ -81,72 +88,10 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams: S
       </div>
 
       {leads && leads.length > 0 ? (
-        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/50">
-                <th className="text-left px-5 py-3.5 text-xs font-semibold text-pg-muted uppercase tracking-wider">
-                  Contact
-                </th>
-                <th className="text-left px-4 py-3.5 text-xs font-semibold text-pg-muted uppercase tracking-wider hidden md:table-cell">
-                  Source
-                </th>
-                <th className="text-left px-4 py-3.5 text-xs font-semibold text-pg-muted uppercase tracking-wider hidden lg:table-cell">
-                  Message
-                </th>
-                <th className="text-left px-4 py-3.5 text-xs font-semibold text-pg-muted uppercase tracking-wider hidden sm:table-cell">
-                  Date
-                </th>
-                <th className="px-4 py-3.5 text-xs font-semibold text-pg-muted uppercase tracking-wider text-left">
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-5 py-4">
-                    <p className="font-medium text-pg-dark">{lead.name}</p>
-                    <a
-                      href={`mailto:${lead.email}`}
-                      className="text-xs text-pg-muted hover:text-pg-gold transition-colors"
-                    >
-                      {lead.email}
-                    </a>
-                    {lead.phone && (
-                      <p className="text-xs text-pg-muted mt-0.5">{String(lead.phone)}</p>
-                    )}
-                  </td>
-                  <td className="px-4 py-4 hidden md:table-cell">
-                    <span className="text-xs text-pg-muted">
-                      {SOURCE_LABELS[String(lead.source)] ?? String(lead.source)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 hidden lg:table-cell max-w-xs">
-                    <p className="text-xs text-pg-muted truncate">
-                      {lead.message ? String(lead.message).slice(0, 80) : "—"}
-                    </p>
-                  </td>
-                  <td className="px-4 py-4 hidden sm:table-cell">
-                    <span className="text-xs text-pg-muted">
-                      {new Date(String(lead.created_at)).toLocaleDateString("en-AE", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <LeadStatusSelect
-                      id={String(lead.id)}
-                      status={lead.status as LeadStatus}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <LeadsTable
+          leads={leads as Parameters<typeof LeadsTable>[0]["leads"]}
+          propertyMap={propertyMap}
+        />
       ) : (
         <div className="bg-white border border-gray-100 rounded-2xl p-16 text-center">
           <p className="font-heading font-semibold text-pg-dark mb-1">No leads found</p>

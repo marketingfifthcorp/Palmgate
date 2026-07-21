@@ -78,7 +78,7 @@ export default function CtaBannerWithModal() {
               <X size={20} />
             </button>
             <h3 className="font-heading font-semibold text-white text-2xl leading-tight mb-2">
-              Request Your Valuation
+              Request Your Consultation
             </h3>
             <p className="text-white/65 text-[13px] leading-relaxed">
               Fill in the details below, and one of our luxury property specialists will get in

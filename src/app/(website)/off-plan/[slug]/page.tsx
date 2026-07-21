@@ -138,17 +138,20 @@ export default async function OffPlanDetailPage({ params }: { params: Params }) 
           <div className="flex flex-wrap items-center justify-center gap-3">
             <RegisterInterestModal
               projectName={project.title as string}
+              propertyId={project.id as string}
               trigger="register"
               className="px-7 py-3 bg-white text-pg-dark text-[13px] font-semibold hover:bg-white/90 transition-colors"
             />
             <RegisterInterestModal
               projectName={project.title as string}
+              propertyId={project.id as string}
               trigger="brochure"
               brochureUrl={brochureUrl}
               className="px-7 py-3 bg-white/20 border border-white/50 text-white text-[13px] font-semibold hover:bg-white/30 transition-colors backdrop-blur-sm"
             />
             <RegisterInterestModal
               projectName={project.title as string}
+              propertyId={project.id as string}
               trigger="callback"
               className="px-7 py-3 bg-white/20 border border-white/50 text-white text-[13px] font-semibold hover:bg-white/30 transition-colors backdrop-blur-sm"
             />
@@ -277,6 +280,7 @@ export default async function OffPlanDetailPage({ params }: { params: Params }) 
                   )}
                   <RegisterInterestModal
                     projectName={`${unit.type} at ${project.title as string}`}
+                    propertyId={project.id as string}
                     trigger="register"
                     label="Register Interest"
                     className="inline-flex items-center gap-2 border border-pg-dark text-pg-dark text-[11px] font-semibold uppercase tracking-widest px-6 py-3 hover:bg-pg-dark hover:text-white transition-colors"
@@ -344,6 +348,36 @@ export default async function OffPlanDetailPage({ params }: { params: Params }) 
           </div>
         </section>
       )}
+
+      {/* ── CTA ──────────────────────────────────────────────── */}
+      <section className="py-20 bg-pg-dark">
+        <div className="max-w-2xl mx-auto px-6 text-center">
+          <p className="text-white/45 text-[11px] font-medium uppercase tracking-[0.18em] mb-3">
+            Get In Touch
+          </p>
+          <h2 className="font-heading font-semibold text-white text-2xl md:text-[32px] leading-tight mb-4">
+            Interested in {project.title as string}?
+          </h2>
+          <p className="text-white/55 text-[14px] leading-relaxed mb-8">
+            Leave your details and one of our specialists will reach out to walk you through availability, pricing, and next steps.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <RegisterInterestModal
+              projectName={project.title as string}
+              propertyId={project.id as string}
+              trigger="register"
+              label="Register Interest"
+              className="px-7 py-3 border border-pg-gold text-pg-gold text-[13px] font-medium hover:bg-pg-gold hover:text-white transition-colors"
+            />
+            <RegisterInterestModal
+              projectName={project.title as string}
+              propertyId={project.id as string}
+              trigger="callback"
+              className="px-7 py-3 border border-white/30 text-white text-[13px] font-medium hover:bg-white/10 transition-colors"
+            />
+          </div>
+        </div>
+      </section>
 
       {/* ── MAP ──────────────────────────────────────────────── */}
       {project.lat && project.lng && (
