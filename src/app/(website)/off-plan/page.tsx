@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPublicUrl } from "@/lib/supabase/storage";
 import { WHATSAPP_NUMBER } from "@/lib/off-plan-data";
 import OffPlanFilterBar from "@/components/off-plan/OffPlanFilterBar";
+import EmptyListings from "@/components/properties/EmptyListings";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +103,7 @@ export default async function OffPlanPage({
 
   const { data, error } = await query;
   const projects = (error ? [] : (data ?? [])) as unknown as ProjectRow[];
+  const hasFilters = !!(q || developer);
 
   return (
     <div className="min-h-screen bg-white">
@@ -124,12 +126,20 @@ export default async function OffPlanPage({
           </div>
 
           {projects.length === 0 ? (
-            <div className="text-center py-24">
-              <h3 className="font-heading font-bold text-pg-dark text-xl mb-2">
-                No developments found
-              </h3>
-              <p className="text-pg-muted text-sm">Try adjusting your search.</p>
-            </div>
+            hasFilters ? (
+              <div className="text-center py-24">
+                <h3 className="font-heading text-2xl text-pg-dark mb-3">No Developments Match Your Search</h3>
+                <p className="text-pg-muted text-[15px] mb-6">Try adjusting or clearing your search to see all projects.</p>
+                <Link href="/off-plan" className="inline-flex items-center gap-2 border border-pg-dark text-pg-dark text-[13px] font-semibold px-6 py-3 hover:bg-pg-dark hover:text-white transition-colors">
+                  Clear Search
+                </Link>
+              </div>
+            ) : (
+              <EmptyListings
+                heading="No Off-Plan Projects Listed Yet"
+                subtext="We're adding new off-plan developments regularly. Get in touch and our team will keep you updated."
+              />
+            )
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {projects.map((p) => {

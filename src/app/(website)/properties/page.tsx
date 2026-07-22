@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +11,7 @@ import PropertiesFilterBar from "@/components/properties/PropertiesFilterBar";
 import SortSelect from "@/components/properties/SortSelect";
 import Pagination from "@/components/properties/Pagination";
 import PropertiesShowTabs from "@/components/properties/PropertiesShowTabs";
+import EmptyListings from "@/components/properties/EmptyListings";
 import { Map } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -126,6 +128,7 @@ export default async function PropertiesPage({
   }
 
   const totalPages = Math.ceil(total / limit);
+  const hasFilters = !!(type || availability || condition || minPrice || maxPrice || beds || baths || community || q);
 
   return (
     <div className="min-h-screen bg-white">
@@ -171,16 +174,18 @@ export default async function PropertiesPage({
           </div>
 
           {/* Results grid */}
-          {fetchError ? (
-            <div className="text-center py-24 text-pg-muted text-sm">
-              Unable to load properties. Please try again later.
-            </div>
+          {fetchError || (properties.length === 0 && !hasFilters) ? (
+            <EmptyListings
+              heading="No Properties Listed Yet"
+              subtext="We're curating new listings for this market. In the meantime, get in touch with our team."
+            />
           ) : properties.length === 0 ? (
             <div className="text-center py-24">
-              <h3 className="font-heading font-bold text-pg-dark text-xl mb-2">
-                No properties found
-              </h3>
-              <p className="text-pg-muted text-sm">Try adjusting your filters or search terms.</p>
+              <h3 className="font-heading text-2xl text-pg-dark mb-3">No Properties Match Your Filters</h3>
+              <p className="text-pg-muted text-[15px] mb-6">Try adjusting or clearing your filters to see more results.</p>
+              <Link href="/properties" className="inline-flex items-center gap-2 border border-pg-dark text-pg-dark text-[13px] font-semibold px-6 py-3 hover:bg-pg-dark hover:text-white transition-colors">
+                Clear All Filters
+              </Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
