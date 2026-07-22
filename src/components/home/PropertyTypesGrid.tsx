@@ -5,42 +5,42 @@ const TYPES = [
   {
     label: "Studios",
     href: "/properties?type=apartment&beds=0",
-    imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=600&fit=crop&auto=format",
+    imageUrl: "/images/studio-home.png",
   },
   {
     label: "Apartments",
     href: "/properties?type=apartment",
-    imageUrl: "https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=600&h=600&fit=crop&auto=format",
+    imageUrl: "/images/apartment-home.png",
   },
   {
     label: "Villas",
     href: "/properties?type=villa",
-    imageUrl: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=600&fit=crop&auto=format",
+    imageUrl: "/images/villas-home.png",
   },
   {
     label: "Townhouses",
     href: "/properties?type=townhouse",
-    imageUrl: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=600&fit=crop&auto=format",
+    imageUrl: "/images/town-home.png",
   },
   {
     label: "Penthouses",
     href: "/properties?type=penthouse",
-    imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=600&fit=crop&auto=format",
+    imageUrl: "/images/pent-home.png",
   },
   {
     label: "Serviced Apts",
     href: "/properties?type=apartment",
-    imageUrl: "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=600&h=600&fit=crop&auto=format",
+    imageUrl: "/images/serviced-home.png",
   },
   {
     label: "Commercial",
     href: "/properties?type=office",
-    imageUrl: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&h=600&fit=crop&auto=format",
+    imageUrl: "/images/commercial-home.png",
   },
   {
     label: "Duplexes",
     href: "/properties?type=townhouse",
-    imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=600&fit=crop&auto=format",
+    imageUrl: "/images/duplexes-home.png",
   },
 ];
 
@@ -50,8 +50,8 @@ export default function PropertyTypesGrid() {
       <div className="max-w-screen-xl mx-auto px-6">
         <div className="flex items-end justify-between mb-10">
           <div>
-            <h2 className="font-sans font-bold text-3xl md:text-4xl text-pg-dark uppercase tracking-wide">
-              Browse our top listings
+            <h2 className="font-heading font-bold text-3xl md:text-4xl text-pg-dark">
+              Explore Properties by Type
             </h2>
           </div>
         </div>

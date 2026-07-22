@@ -45,7 +45,7 @@ export default function AgentPhotoUploader({ propertyId, initialPath, onSave }: 
 
   return (
     <section className="bg-white border border-gray-100 rounded-2xl p-6">
-      <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider mb-4">
+      <h3 className="font-heading font-semibold text-pg-dark text-sm mb-4">
         Agent Photo
       </h3>
 

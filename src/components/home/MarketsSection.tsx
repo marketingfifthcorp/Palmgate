@@ -27,7 +27,7 @@ export default function MarketsSection() {
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-10">
-          <h2 className="font-sans font-bold text-3xl md:text-4xl text-pg-dark uppercase tracking-wide">
+          <h2 className="font-heading font-bold text-3xl md:text-4xl text-pg-dark">
             Your Doorway To Global Property Investments
           </h2>
         </div>

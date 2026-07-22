@@ -175,7 +175,14 @@ export default async function OffPlanDetailPage({ params }: { params: Params }) 
               { Icon: Monitor,   label: "Prices from",      value: priceFrom },
               { Icon: Calendar,  label: "Handover Date",    value: handover },
               { Icon: MapPin,    label: "Location",         value: (project.community ?? project.emirate ?? "Oman") as string },
-              { Icon: Building2, label: "Development Type", value: project.type ? (project.type as string).charAt(0).toUpperCase() + (project.type as string).slice(1) : "Residential" },
+              { Icon: Building2, label: "Bedrooms", value: (() => {
+                  const min = project.bedrooms as number | null;
+                  const max = project.bathrooms as number | null;
+                  if (min == null) return "TBA";
+                  if (min === 0) return "Studio";
+                  if (max != null && max > min) return `${min}–${max} BR`;
+                  return `${min} BR`;
+                })() },
             ].map(({ Icon, label, value }) => (
               <div key={label} className="flex flex-col items-center text-center gap-3">
                 <div className="w-11 h-11 rounded-lg bg-stone-100 flex items-center justify-center">

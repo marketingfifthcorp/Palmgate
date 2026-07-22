@@ -179,7 +179,7 @@ export default function SellWithUsPage() {
 
             {/* Left: massive headline */}
             <div className="flex items-start pt-4">
-              <h2 className="font-heading font-bold text-pg-dark leading-[0.92] text-[80px] md:text-[110px] lg:text-[130px] xl:text-[160px] uppercase">
+              <h2 className="font-heading font-bold text-pg-dark leading-[0.92] text-[80px] md:text-[110px] lg:text-[130px] xl:text-[160px]">
                 Let&apos;s<br />Get In<br />Touch
               </h2>
             </div>

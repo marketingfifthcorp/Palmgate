@@ -177,7 +177,7 @@ export default async function PropertiesPage({
             </div>
           ) : properties.length === 0 ? (
             <div className="text-center py-24">
-              <h3 className="font-sans font-bold uppercase tracking-wide text-pg-dark text-xl mb-2">
+              <h3 className="font-heading font-bold text-pg-dark text-xl mb-2">
                 No properties found
               </h3>
               <p className="text-pg-muted text-sm">Try adjusting your filters or search terms.</p>

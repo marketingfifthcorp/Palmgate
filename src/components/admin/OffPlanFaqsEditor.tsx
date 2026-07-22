@@ -129,7 +129,7 @@ export default function OffPlanFaqsEditor({ initialFaqs, onSave }: Props) {
     <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">FAQs</h3>
+          <h3 className="font-heading font-semibold text-pg-dark text-sm">FAQs</h3>
           <p className="text-xs text-pg-muted mt-0.5">Add questions manually or paste text to auto-parse.</p>
         </div>
         <div className="flex items-center gap-2">

@@ -52,7 +52,7 @@ export default function OffPlanBrochureUploader({ propertyId, initialPath, onSav
   return (
     <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
       <div>
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm">
           Brochure (PDF)
         </h3>
         <p className="text-xs text-pg-muted mt-0.5">

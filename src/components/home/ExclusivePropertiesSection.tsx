@@ -64,7 +64,7 @@ export default function ExclusivePropertiesSection() {
         {/* Header */}
         <div className="flex items-end justify-between mb-10">
           <div>
-            <h2 className="font-sans font-bold text-3xl md:text-4xl text-pg-dark uppercase tracking-wide">
+            <h2 className="font-heading font-bold text-3xl md:text-4xl text-pg-dark">
               Exclusive Properties From Top Developers
             </h2>
           </div>
@@ -116,7 +116,7 @@ export default function ExclusivePropertiesSection() {
                   <MapPin size={11} className="text-white/60 shrink-0" />
                   <span className="text-white/60 text-xs">{p.location}, {p.emirate}</span>
                 </div>
-                <h3 className="font-sans font-bold text-white uppercase tracking-wide text-[15px] leading-tight mb-2">
+                <h3 className="font-heading font-bold text-white text-[15px] leading-tight mb-2">
                   {p.title}
                 </h3>
                 <p className="text-white/70 text-xs">

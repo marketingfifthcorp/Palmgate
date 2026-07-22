@@ -228,7 +228,7 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
     <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
       {/* Core */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm">
           Basic Info
         </h3>
         <div>
@@ -262,7 +262,7 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
 
       {/* Classification */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm">
           Classification
         </h3>
         <div className="grid sm:grid-cols-3 gap-4">
@@ -293,7 +293,7 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
 
       {/* Pricing & Size */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm">
           Pricing & Size
         </h3>
         <div className="grid sm:grid-cols-2 gap-4">
@@ -310,45 +310,62 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
               onChange={(e) => set("currency", e.target.value)}
               placeholder="AED" className={inputClass} />
           </div>
-          <div>
-            <label className={labelClass}>{isOffPlan ? "Bedrooms (from)" : "Bedrooms"}</label>
-            <input type="number" value={f.bedrooms}
-              onChange={(e) => set("bedrooms", e.target.value)}
-              placeholder={isOffPlan ? "e.g. 1 (smallest unit)" : "2"} min="0"
-              className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass}>{isOffPlan ? "Bathrooms (from)" : "Bathrooms"}</label>
-            <input type="number" value={f.bathrooms}
-              onChange={(e) => set("bathrooms", e.target.value)}
-              placeholder={isOffPlan ? "e.g. 1 (smallest unit)" : "2"} min="0"
-              className={inputClass} />
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className={labelClass.replace("mb-1.5", "")}>Area</label>
-              <div className="flex rounded-md border border-gray-200 overflow-hidden text-[11px] font-semibold">
-                <button type="button" onClick={() => switchAreaUnit("sqft")}
-                  className={`px-2.5 py-1 transition-colors ${areaUnit === "sqft" ? "bg-pg-dark text-white" : "text-pg-muted hover:text-pg-dark"}`}>
-                  sqft
-                </button>
-                <button type="button" onClick={() => switchAreaUnit("sqm")}
-                  className={`px-2.5 py-1 transition-colors ${areaUnit === "sqm" ? "bg-pg-dark text-white" : "text-pg-muted hover:text-pg-dark"}`}>
-                  sq m
-                </button>
+          {isOffPlan ? (
+            /* Off-plan: bedroom range (from → to), bathrooms repurposed as max bedrooms, area hidden */
+            <div className="sm:col-span-2">
+              <label className={labelClass}>Bedrooms Range</label>
+              <div className="flex items-center gap-3">
+                <input type="number" value={f.bedrooms}
+                  onChange={(e) => set("bedrooms", e.target.value)}
+                  placeholder="1" min="0" className={inputClass} />
+                <span className="text-pg-muted text-sm shrink-0">to</span>
+                <input type="number" value={f.bathrooms}
+                  onChange={(e) => set("bathrooms", e.target.value)}
+                  placeholder="4" min="0" className={inputClass} />
               </div>
+              <p className="text-[11px] text-pg-muted mt-1.5">Enter the minimum and maximum bedroom count (e.g. 1 to 4)</p>
             </div>
-            <input type="number" value={f.area_sqft}
-              onChange={(e) => set("area_sqft", e.target.value)}
-              placeholder={areaUnit === "sqft" ? "1200" : "111"} min="0"
-              className={inputClass} />
-          </div>
+          ) : (
+            <>
+              <div>
+                <label className={labelClass}>Bedrooms</label>
+                <input type="number" value={f.bedrooms}
+                  onChange={(e) => set("bedrooms", e.target.value)}
+                  placeholder="2" min="0" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Bathrooms</label>
+                <input type="number" value={f.bathrooms}
+                  onChange={(e) => set("bathrooms", e.target.value)}
+                  placeholder="2" min="0" className={inputClass} />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className={labelClass.replace("mb-1.5", "")}>Area</label>
+                  <div className="flex rounded-md border border-gray-200 overflow-hidden text-[11px] font-semibold">
+                    <button type="button" onClick={() => switchAreaUnit("sqft")}
+                      className={`px-2.5 py-1 transition-colors ${areaUnit === "sqft" ? "bg-pg-dark text-white" : "text-pg-muted hover:text-pg-dark"}`}>
+                      sqft
+                    </button>
+                    <button type="button" onClick={() => switchAreaUnit("sqm")}
+                      className={`px-2.5 py-1 transition-colors ${areaUnit === "sqm" ? "bg-pg-dark text-white" : "text-pg-muted hover:text-pg-dark"}`}>
+                      sq m
+                    </button>
+                  </div>
+                </div>
+                <input type="number" value={f.area_sqft}
+                  onChange={(e) => set("area_sqft", e.target.value)}
+                  placeholder={areaUnit === "sqft" ? "1200" : "111"} min="0"
+                  className={inputClass} />
+              </div>
+            </>
+          )}
         </div>
       </section>
 
       {/* Property Details */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm">
           Property Details
         </h3>
         <div className="grid sm:grid-cols-2 gap-4">
@@ -392,7 +409,7 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
 
       {/* Agent Contact */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm">
           Agent Contact
         </h3>
         <div className="grid sm:grid-cols-2 gap-4">
@@ -430,7 +447,7 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
 
       {/* Location */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm">
           Location
         </h3>
         <div className="grid sm:grid-cols-2 gap-4">
@@ -478,7 +495,7 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
       {/* Off-plan extras */}
       {isOffPlan && (
         <section className="bg-white border border-pg-gold/20 rounded-2xl p-6 space-y-5">
-          <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+          <h3 className="font-heading font-semibold text-pg-dark text-sm">
             Off-Plan Details
           </h3>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -519,7 +536,7 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
       {/* Amenities */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+          <h3 className="font-heading font-semibold text-pg-dark text-sm">
             Amenities
           </h3>
           {f.amenities.length > 0 && (
@@ -621,7 +638,7 @@ export default function PropertyForm({ initial, action, redirectTo = "/admin/pro
 
       {/* Visibility */}
       <section className="bg-white border border-gray-100 rounded-2xl p-6">
-        <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider mb-4">
+        <h3 className="font-heading font-semibold text-pg-dark text-sm mb-4">
           Visibility
         </h3>
         <div className="flex gap-6">

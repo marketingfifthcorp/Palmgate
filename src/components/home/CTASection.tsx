@@ -53,13 +53,14 @@ export default function CTASection({ initialLand = false }: Props) {
               Get in Touch
             </p>
             <h2 className="font-heading font-medium text-4xl md:text-5xl leading-[1.05] text-pg-dark mb-6">
-              Looking to buy, sell, or invest in property?
+              {initialLand
+                ? "Looking to acquire land or explore investment opportunities?"
+                : "Looking to buy, sell, or invest in property?"}
             </h2>
             <p className="text-pg-body text-[15px] leading-relaxed mb-8 max-w-sm">
-              Tell us what you&apos;re looking for and our team will help you find
-              the right opportunity in Oman. Whether you&apos;re searching for a home,
-              listing a property, or exploring investment options, we&apos;re here
-              to guide you.
+              {initialLand
+                ? "Tell us about the land or investment you have in mind and our team will connect you with the right opportunities across Oman."
+                : <>Tell us what you&apos;re looking for and our team will help you find the right opportunity in Oman. Whether you&apos;re searching for a home, listing a property, or exploring investment options, we&apos;re here to guide you.</>}
             </p>
             <div className="flex items-center gap-3">
               <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />

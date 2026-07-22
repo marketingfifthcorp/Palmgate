@@ -30,8 +30,8 @@ export default function OffPlanSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="flex items-end justify-between mb-10">
-          <h2 className="font-sans font-bold text-3xl md:text-4xl text-pg-dark uppercase tracking-wide">
-            Top Off-Plan From Developers
+          <h2 className="font-heading font-bold text-3xl md:text-4xl text-pg-dark">
+            Exculsive Properties From Developers
           </h2>
           <Link
             href="/off-plan"
@@ -69,7 +69,7 @@ export default function OffPlanSection() {
 
               {/* Card body */}
               <div className="flex flex-col flex-1 p-4">
-                <h3 className="font-sans font-bold text-pg-dark text-base uppercase tracking-wide leading-tight mb-1">
+                <h3 className="font-heading font-bold text-pg-dark text-base leading-tight mb-1">
                   {p.title}
                 </h3>
                 <p className="text-pg-body text-sm mb-1">{p.types}</p>

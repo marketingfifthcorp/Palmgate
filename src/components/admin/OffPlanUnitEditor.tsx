@@ -156,7 +156,7 @@ export default function OffPlanUnitEditor({ propertyId, initialUnits, onSave }: 
     <section className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-heading font-semibold text-pg-dark text-sm uppercase tracking-wider">
+          <h3 className="font-heading font-semibold text-pg-dark text-sm">
             Unit Types
           </h3>
           <p className="text-xs text-pg-muted mt-0.5">

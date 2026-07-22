@@ -43,6 +43,7 @@ type ProjectRow = {
   price: number | null;
   currency: string | null;
   bedrooms: number | null;
+  bathrooms: number | null;
   type: string | null;
   completion_date: string | null;
   community: string | null;
@@ -79,7 +80,7 @@ export default async function OffPlanPage({
   let query = supabase
     .from("properties")
     .select(
-      "id, slug, title, price, currency, bedrooms, type, completion_date, community, emirate, developer, featured, availability, property_images(storage_path, alt, is_primary)"
+      "id, slug, title, price, currency, bedrooms, bathrooms, type, completion_date, community, emirate, developer, featured, availability, property_images(storage_path, alt, is_primary)"
     )
     .eq("condition", "off_plan")
     .eq("published", true);
@@ -124,7 +125,7 @@ export default async function OffPlanPage({
 
           {projects.length === 0 ? (
             <div className="text-center py-24">
-              <h3 className="font-sans font-bold uppercase tracking-wide text-pg-dark text-xl mb-2">
+              <h3 className="font-heading font-bold text-pg-dark text-xl mb-2">
                 No developments found
               </h3>
               <p className="text-pg-muted text-sm">Try adjusting your search.</p>
@@ -172,7 +173,7 @@ export default async function OffPlanPage({
 
                     {/* Card body */}
                     <div className="flex flex-col flex-1 p-4">
-                      <h3 className="font-sans font-bold text-pg-dark text-base uppercase tracking-wide leading-tight mb-1">
+                      <h3 className="font-heading font-bold text-pg-dark text-base leading-tight mb-1">
                         {p.title}
                       </h3>
                       <p className="text-pg-body text-sm mb-1 capitalize">{p.type ?? "Residential"}</p>
@@ -196,7 +197,13 @@ export default async function OffPlanPage({
                         <div className="px-2.5">
                           <p className="text-[10px] text-pg-muted mb-0.5">Bedrooms</p>
                           <p className="text-xs font-semibold text-pg-dark">
-                            {p.bedrooms != null ? (p.bedrooms === 0 ? "Studio" : `${p.bedrooms} BR`) : "TBA"}
+                            {p.bedrooms != null
+                              ? p.bedrooms === 0
+                                ? "Studio"
+                                : p.bathrooms != null && p.bathrooms > p.bedrooms
+                                  ? `${p.bedrooms}–${p.bathrooms} BR`
+                                  : `${p.bedrooms} BR`
+                              : "TBA"}
                           </p>
                         </div>
                         <div className="px-2.5">

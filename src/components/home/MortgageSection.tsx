@@ -10,7 +10,7 @@ export default function MortgageSection() {
           Land &amp; Investment
         </p>
         <h2 className="font-heading font-medium text-3xl md:text-4xl lg:text-[46px] leading-[1.1] mb-5">
-          Looking to buy or sell land?
+          Looking To Buy Or Sell Land?
         </h2>
         <p className="text-white/45 text-[14px] leading-relaxed mb-10 max-w-md">
           From prime plots in emerging communities to fully serviced land in established

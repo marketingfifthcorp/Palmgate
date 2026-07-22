@@ -149,7 +149,7 @@ export default function Hero() {
         >
           <div className="w-full max-w-7xl mx-auto flex flex-col items-center">
             <div className="w-full max-w-2xl">
-              <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] xl:text-[64px] text-white font-medium leading-[1.05] mb-8 uppercase tracking-wide">
+              <h1 className="font-heading text-4xl md:text-5xl lg:text-[56px] xl:text-[64px] text-white font-medium leading-[1.05] mb-8">
                 Find Your Place.
               </h1>
 
