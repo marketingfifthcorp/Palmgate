@@ -3,22 +3,22 @@ import Link from "next/link";
 
 const MARKETS = [
   {
-    country: "United Arab Emirates",
-    city: "Dubai",
-    href: "/properties?location=dubai",
-    imageUrl: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&h=700&fit=crop&auto=format",
-  },
-  {
     country: "Oman",
     city: "Muscat",
     href: "/properties?location=muscat",
-    imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&h=700&fit=crop&auto=format",
+    imageUrl: "/images/OMAN.png",
   },
   {
-    country: "Saudi Arabia",
-    city: "Riyadh",
-    href: "/properties?location=riyadh",
-    imageUrl: "https://images.unsplash.com/photo-1586724237569-f3d0c1dee8c6?w=900&h=700&fit=crop&auto=format",
+    country: "Zanzibar",
+    city: "Stone Town",
+    href: "/properties?location=zanzibar",
+    imageUrl: "/images/Zanzibar.png",
+  },
+  {
+    country: "Thailand",
+    city: "Bangkok",
+    href: "/properties?location=bangkok",
+    imageUrl: "/images/THAILAND.png",
   },
 ];
 
